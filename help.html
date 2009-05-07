@@ -3,6 +3,7 @@
 <meta http-equiv="Content-Style-Type" content="text/css">
 <meta http-equiv="Content-Script-Type" content="text/javascript">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="docs.css"> 
 <title>Scrlr - Help</title>
 </head>
 <body>
@@ -36,6 +37,7 @@
   <li>画面をクリックすると、一時停止状態とスクロールする状態が切り替わります。
   <li>検索結果のテキストをクリックすると、そのテキストのページが新しいウィンドウで開きます。
   <li>検索キーワードは次のように決まります。一番最初に三日前のニュースが検索され、そのテキスト中からキーワードがランダムに選ばれます。以降は、「キーワードで検索」、「検索結果のテキストからランダムにキーワードを拾う」、「それでまた検索する」の繰り返しになります。
+  <li>ランダムに選んだキーワードで検索結果の数が 0 件になった場合は、数十秒待ったあとに違うキーワードで検索を試みます。待っている間は表示するデータがないので、スクロールは止まります。
 </ul>
 
 <h2>おすすめの使い方</h2>
@@ -59,9 +61,9 @@ Scrlr のおすすめの使い方は、ブラウザを全画面表示してス�
 Scrlr は次のソフトウェアやサービスを利用させてもらっています。ありがとうございます。
 
 <ul>
-  <li><a href="http://www.ajaxload.info/">Ajaxload - Ajax loading gif generator</a>
   <li><span style="margin:15px 15px 15px 15px"><a href="http://developer.yahoo.co.jp/about">Webサービス by Yahoo! JAPAN</a></span>
   <li><a href="http://developer.yahoo.com/search/image/V1/imageSearch.html" >Yahoo! Image Search</a>
+  <li><a href="http://www.ajaxload.info/">Ajaxload - Ajax loading gif generator</a>
   <li><a href="http://developer.yahoo.com/yui/">The Yahoo! User Interface Library (YUI)</a>
   <li><a href="http://www.xml.com/2005/12/21/examples/jsr_class.zip" >JSONscriptRequest</a> -- a simple class for making HTTP requests using dynamically generated script tags and JSON
       ( <a href="http://www.xml.com/pub/a/2005/12/21/json-dynamic-script-tag.html" >XML.com: JSON and the Dynamic Script Tag: Easy, XML-less Web Services for JavaScript</a> )

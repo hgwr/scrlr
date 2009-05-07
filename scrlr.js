@@ -145,7 +145,7 @@ Scrlr.prototype = {
 		var q = null;
 		var shortQueue = (this.queue.length <= 3);
 		var shortImgQueue = (this.imgQueue.length <= 3);
-		if (shortQueue || shortImgQueu) {
+		if (shortQueue || shortImgQueue) {
 			q = this.keywordFromPanels();
 			if(q === undefined || q === null) {
 				var date = new Date();

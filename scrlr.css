@@ -3,13 +3,15 @@ body {
   padding: 0px;
   margin: 0px;
   border: #000 0px solid;
-  color: #888;
+  color: #777;
   background-color: #000;
   font-family: sans-serif;
+  line-height: 150%;
 }
 
 a { 
-  color: #888;
+  color: #777;
+  background-color: #000;
 }
 
 div#header {
@@ -18,14 +20,14 @@ div#header {
   left: 0px;
   width: 100%;
   height: 2em;
-  color: #888;
+  color: #777;
   background-color: #000;
   font-family: sans-serif;
   z-index: 100;
 }
 
 span#scrlr, span#status {
-  color: #888;
+  color: #777;
   background-color: #000;
 }
 
@@ -64,7 +66,7 @@ div#canvas {
   left: 0px;
   width: 100%;
   height: 100%;
-  color: #888;
+  color: #777;
   background-color: #000;
   z-index: 10;
 }
@@ -76,7 +78,7 @@ div.panel {
   border-width: 0px 0px 0px 0px;
   border-style: solid;
   border-color: #aaa;
-  color: #888;
+  color: #777;
   background-color: #000;
   z-index: 50;
 }
