@@ -144,7 +144,7 @@ Scrlr.prototype = {
 	prepareQueue : function () {
 		var q = null;
 		var shortQueue = (this.queue.length <= 3);
-		var shortImgQueu = (this.imgQueue.length <= 3);
+		var shortImgQueue = (this.imgQueue.length <= 3);
 		if (shortQueue || shortImgQueu) {
 			q = this.keywordFromPanels();
 			if(q === undefined || q === null) {
@@ -165,7 +165,7 @@ Scrlr.prototype = {
 			this.showHeader();
 			webSearch(q);
 		}
-		if (shortImgQueu && now.getTime() - this.lastImgQueryTime >= 30000) {
+		if (shortImgQueue && now.getTime() - this.lastImgQueryTime >= 30000) {
 			this.showHeader();
 			imgSearch(q);
 		}
