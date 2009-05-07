@@ -7,14 +7,15 @@
 </head>
 <body>
 <a href="javascript:void(0)" onClick="window.close(); return false;" >Close</a>
+<a href="http://www.moreslowly.jp/" >moreslowly.jp</a>
 <h1>Scrlr - Help</h1>
 
 <p>
-(2009-05-07 現在、まだ書き中)
+(2009-05-09 現在、まだ書き中)
 </p>
 
 <p>
-Scrlr (スクローラー) は、ニュースやウェブを自動でスクロールして眺めるためのソフトウェアです。
+<a href="." >Scrlr</a> (スクローラー) は、ニュースやウェブを自動でスクロールして眺めるためのソフトウェアです。
 </p>
 
 <p>
@@ -27,19 +28,30 @@ Scrlr (スクローラー) は、ニュースやウェブを自動でスクロ�
 
 <h2>動作</h2>
 
+<ul>
+  <li>基本的には全自動です。
+  <li>画面の左半分では、Scrlr がウェブ検索した結果が、下から上へスクロールします。
+  <li>画面の右半分は、イメージ検索して取得した結果が画像とともに、下から上へスクロールします。
+  <li>画面の上部にヘッダーバーがあります。このバーは使われないと自動で隠れます。マウスカーソルを画面の上部に持っていくと、またヘッダーバーが現れます。このヘッダーバーには直近の検索で使われたキーワードなどが表示されます。
+  <li>画面をクリックすると、一時停止状態とスクロールする状態が切り替わります。
+  <li>検索結果のテキストをクリックすると、そのテキストのページが新しいウィンドウで開きます。
+  <li>検索キーワードは次のように決まります。一番最初に三日前のニュースが検索され、そのテキスト中からキーワードがランダムに選ばれます。以降は、「キーワードで検索」、「検索結果のテキストからランダムにキーワードを拾う」、「それでまた検索する」の繰り返しになります。
+</ul>
+
+<h2>おすすめの使い方</h2>
+
 <p>
-画面の左半分では、適当にウェブ検索したりニュース検索して取得したテキストが、下から上へスクロールします。
+Scrlr のおすすめの使い方は、ブラウザを全画面表示してスクリーンセーバの代わりにすることです。
+デュアル・ディスプレイ環境で、使ってない片面に表示させるなどもいいかもしれません。
 </p>
 
 <p>
-画面の右半分は、イメージ検索して取得した画像が下から上へスクロールします。
+<a href="http://www.microsoft.com/japan/windows/products/winfamily/ie/function/default.mspx" >IE8</a> や <a href="http://jp.opera.com/" >Opera ブラウザ</a>では、ファンクションキーの F11 などで、全画面表示に切り替えられます。
 </p>
 
 <p>
-Scrlr のおすすめの使用方法は、 Firefox に
-<a href="https://addons.mozilla.org/en-US/firefox/addon/1568" >Full Fullscreen :: Firefox Add-ons</a>
-などの完全全画面化するアドオンを入れて、スクリーンセーバの代わりにすることです。
-デュアル・ディスプレイ環境で、片面を使ってない場合に、そっちで動かすなどがいいかもしれません。
+<a href="http://mozilla.jp/firefox/" >Firefox</a> では、全画面表示にしてもアドレスバーやタブバーが残ります。ページの内容のみの全画面表示にするには <a href="https://addons.mozilla.org/en-US/firefox/addon/1568" >Full Fullscreen :: Firefox Add-ons</a>
+などのアドオンを使う必要があります。
 </p>
 
 <h2>謝辞</h2>
@@ -49,7 +61,7 @@ Scrlr は次のソフトウェアやサービスを利用させてもらって�
 <ul>
   <li><a href="http://www.ajaxload.info/">Ajaxload - Ajax loading gif generator</a>
   <li><span style="margin:15px 15px 15px 15px"><a href="http://developer.yahoo.co.jp/about">Webサービス by Yahoo! JAPAN</a></span>
-  <li><a href="http://developer.yahoo.com/search/image/V1/imageSearch.html" >Image Search by Yahoo! Search</a>
+  <li><a href="http://developer.yahoo.com/search/image/V1/imageSearch.html" >Yahoo! Image Search</a>
   <li><a href="http://developer.yahoo.com/yui/">The Yahoo! User Interface Library (YUI)</a>
   <li><a href="http://www.xml.com/2005/12/21/examples/jsr_class.zip" >JSONscriptRequest</a> -- a simple class for making HTTP requests using dynamically generated script tags and JSON
       ( <a href="http://www.xml.com/pub/a/2005/12/21/json-dynamic-script-tag.html" >XML.com: JSON and the Dynamic Script Tag: Easy, XML-less Web Services for JavaScript</a> )
