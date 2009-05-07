@@ -26,11 +26,11 @@ Panel.prototype = {
 		html += "<div class='title'>" + title + "</div>" +
 			"<div class='snipet'>" + snipet + "</div>";
 		this.element.innerHTML = html;
-		this.element.style.width = (width
-									- parseInt(YAHOO.util.Dom.getStyle(this.element, 'paddingLeft'), 10)
-									- parseInt(YAHOO.util.Dom.getStyle(this.element, 'paddingRight'), 10)
-									- parseInt(YAHOO.util.Dom.getStyle(this.element, 'marginLeft'), 10)
-									- parseInt(YAHOO.util.Dom.getStyle(this.element, 'marginRight'), 10)
+		this.element.style.width = (width -
+									parseInt(YAHOO.util.Dom.getStyle(this.element, 'paddingLeft'), 10) -
+									parseInt(YAHOO.util.Dom.getStyle(this.element, 'paddingRight'), 10) -
+									parseInt(YAHOO.util.Dom.getStyle(this.element, 'marginLeft'), 10) -
+									parseInt(YAHOO.util.Dom.getStyle(this.element, 'marginRight'), 10)
 								   ) + "px";
 		this.element.title = this.clickUrl;
 		
@@ -58,7 +58,7 @@ Panel.prototype = {
 	onClick : function(e) {
 		try {
 			window.open(this.clickUrl, null);
-		} catch (e) {
+		} catch (ex) {
 			
 		}
 	}
