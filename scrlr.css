@@ -1,0 +1,96 @@
+body {
+  overflow: hidden;
+  padding: 0px;
+  margin: 0px;
+  border: #000 0px solid;
+  color: #888;
+  background-color: #000;
+  font-family: sans-serif;
+}
+
+a { 
+  color: #888;
+}
+
+div#header {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 2em;
+  color: #888;
+  background-color: #000;
+  font-family: sans-serif;
+  z-index: 100;
+}
+
+span#scrlr, span#status {
+  color: #888;
+  background-color: #000;
+}
+
+span#status {
+  font-weight: bold;
+  font-family: monospace;
+  margin-right: 1em;
+}
+
+div#spinner_space { 
+  width: 16px;
+  height: 16px;
+}
+
+img#spinner {
+  display: none;
+  vertical-align: bottom;                          
+}
+
+div#header a, div#header span, div#header img { 
+  vertical-align: bottom;                          
+}
+
+div#mouseCaptureArea {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 2em;
+  z-index: 80;
+}
+
+div#canvas {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  color: #888;
+  background-color: #000;
+  z-index: 10;
+}
+
+div.panel { 
+  position: absolute;
+  padding: 10px;
+  margin: 0px 0px 10px 0px;
+  border-width: 0px 0px 0px 0px;
+  border-style: solid;
+  border-color: #aaa;
+  color: #888;
+  background-color: #000;
+  z-index: 50;
+}
+
+div.panel img {
+  float: left;
+  margin-right: 5px;
+}
+
+div.panel div.title {
+  font-weight: bold;
+  font-size: 150%;
+}
+
+div.panel div.snipet {
+  font-size: 125%;
+}
