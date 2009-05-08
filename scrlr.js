@@ -120,6 +120,10 @@ Scrlr.prototype = {
 		for (var i = 0; i < n; i++) {
 			text += " " + this.panels[i].title + " " + this.panels[i].snipet;
 		}
+		n = this.imgPanels.length;
+		for (i = 0; i < n; i++) {
+			text += " " + this.imgPanels[i].title + " " + this.imgPanels[i].snipet;
+		}
 		var keywords = shuffle(keywordFilter(this.s.parse(text).uniq()));
 		var ret = null;
 		n = keywords.length;

@@ -1,7 +1,7 @@
 function max(a, b) { return (a > b) ? a : b; }
 function min(a, b) { return (a > b) ? b : a; }
 
-var SYMBOLS_RE = new RegExp('^[ 　!-@\\[\\]\\\\\\^_`{|}~、。！？（）「」『』]+$');
+var SYMBOLS_RE = new RegExp('^[ 　!-/\\[\\]\\\\\\^_`{|}~、。！？（）「」『』]+$');
 var keywordFilter = function(keywords) {
 	var ret = [];
 	var n = keywords.length;
