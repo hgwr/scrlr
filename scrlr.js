@@ -4,14 +4,14 @@ var YUE = YAHOO.util.Event;
 var displaySearchStart = function(q) {
 	document.getElementById("spinner").style.display = "inline";
 	document.getElementById("key").innerHTML = '<a href="' +
-		"http://search.yahoo.co.jp/search?ei=UTF-8&p=" + encodeURI(q) + 
+		"http://search.yahoo.co.jp/search?ei=UTF-8&p=" + encodeURIComponent(q) + 
 		'" target="_blank">' + q + '</a>';
 };
 
 var webSearchJsonpRequest = null;
 var webSearch = function(q) {
 	var url = "http://search.yahooapis.jp/WebSearchService/V1/webSearch?appid=" + APPID_Y +
-		"&query=" + encodeURI(q) + "&results=10&output=json&callback=webSearchCallback";
+		"&query=" + encodeURIComponent(q) + "&results=10&output=json&callback=webSearchCallback";
 	displaySearchStart(q);
 	webSearchJsonpRequest = new JSONscriptRequest(url);
 	webSearchJsonpRequest.buildScriptTag();
@@ -21,7 +21,7 @@ var webSearch = function(q) {
 var imgSearchJsonpRequest = null;
 var imgSearch = function(q) {
 	var url = "http://search.yahooapis.com/ImageSearchService/V1/imageSearch?appid=" + APPID_Y_US +
-		"&query=" + encodeURI(q) + "&results=10&output=json&callback=imgSearchCallback";
+		"&query=" + encodeURIComponent(q) + "&results=10&output=json&callback=imgSearchCallback";
 	displaySearchStart(q);
 	imgSearchJsonpRequest = new JSONscriptRequest(url);
 	imgSearchJsonpRequest.buildScriptTag();
