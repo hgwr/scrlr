@@ -14,18 +14,26 @@ Panel.prototype = {
 		this.imgWidth = imgWidth;
 		this.imgHeight = imgHeight;
 
-		var html = '';
 		if (refererUrl !== undefined) {
 			this.clickUrl = refererUrl;
 			this.element.className = "panel img_panel";
-			html += "<img src='" + url + "'" +
-				" width='" + imgWidth + "'" + 
-				" height='" + imgHeight + "'" +
-				" >";
+			this.imgElement = document.createElement("img");
+			this.imgElement.src = url;
+			this.imgElement.width = imgWidth;
+			this.imgElement.height = imgHeight;
+			this.element.appendChild(this.imgElement);
 		}
-		html += "<div class='title'>" + title + "</div>" +
-			"<div class='snipet'>" + snipet + "</div>";
-		this.element.innerHTML = html;
+		
+		this.titleElement = document.createElement("div");
+		this.titleElement.className = "title";
+		this.titleElement.innerHTML = title;
+		this.element.appendChild(this.titleElement);
+		
+		this.snipetElement = document.createElement("div");
+		this.snipetElement.className = "snipet";
+		this.snipetElement.innerHTML = snipet;
+		this.element.appendChild(this.snipetElement);
+		
 		this.element.style.width = (width -
 									parseInt(YAHOO.util.Dom.getStyle(this.element, 'paddingLeft'), 10) -
 									parseInt(YAHOO.util.Dom.getStyle(this.element, 'paddingRight'), 10) -
@@ -41,6 +49,8 @@ Panel.prototype = {
 		this.reloadPosition();
 
 		YAHOO.util.Event.addListener(this.element, "click", this.onClick, this, true);
+		YAHOO.util.Event.addListener(this.element, "mouseover", this.onMouseover, this, true);
+		YAHOO.util.Event.addListener(this.element, "mouseout", this.onMouseout, this, true);
 	},
 	getRealHeight : function() {
 		this.reloadPosition();
@@ -61,5 +71,15 @@ Panel.prototype = {
 		} catch (ex) {
 			
 		}
+	},
+	onMouseover : function(e) {
+		this.style.backgroundColor = "#333";
+		this.titleElement.style.backgroundColor = "#333";
+		this.snipetElement.style.backgroundColor = "#333";
+	},
+	onMouseout : function(e) {
+		this.style.backgroundColor = "#000";
+		this.titleElement.style.backgroundColor = "#000";
+		this.snipetElement.style.backgroundColor = "#000";
 	}
 };
