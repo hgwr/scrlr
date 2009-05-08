@@ -1,3 +1,5 @@
 /config.js
 *~
-
+*.html.gz
+*.js.gz
+*.css.gz
