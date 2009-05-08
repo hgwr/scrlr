@@ -40,21 +40,25 @@ var Scrlr = function() {
 	this.lastImgQueryTime = 0;
 	this.headerVisible = true;
 	this.lastHeaderShowTime = new Date().getTime();
+	this.mouseInHeader = false;
 };
 Scrlr.prototype = {
     onLoad : function() {
 		this.canvas = document.getElementById("canvas");
 		YUE.addListener(["scrlr", "header", "canvas"], "click", this.onScrlrClick, this, true);
-		YUE.addListener("mouseCaptureArea", "mouseover", this.onMouseoverHeader, this, true);
+		YUE.addListener(["header", "mouseCaptureArea"], "mouseover", this.onMouseoverHeader, this, true);
+		YUE.addListener(["header", "mouseCaptureArea"], "mouseout", this.onMouseoutHeader, this, true);
 		this.polling = new Polling(this.tick.bind(this), this.interval);
 		this.polling.run();
-		var p = new Polling(this.checkHideHeader.bind(this), 1000);
+		var p = new Polling(this.checkHideHeader.bind(this), 2000);
 		p.run();
-		document.getElementById("spinner").style.display = "inline";
     },
 
 	checkHideHeader : function() {
-		if (this.polling.running && this.headerVisible && new Date().getTime() - this.lastHeaderShowTime >= 10000) {
+		if (!this.mouseInHeader &&
+			this.polling.running &&
+			this.headerVisible &&
+			new Date().getTime() - this.lastHeaderShowTime >= 10000) {
 			this.hideHeader();
 		}
 	},
@@ -69,7 +73,12 @@ Scrlr.prototype = {
     },
 
 	onMouseoverHeader : function(e) {
+		this.mouseInHeader = true;
 		this.showHeader();
+	},
+
+	onMouseoutHeader : function(e) {
+		this.mouseInHeader = false;
 	},
 
 	showHeader : function() {
@@ -82,7 +91,7 @@ Scrlr.prototype = {
 	},
 
 	hideHeader : function() {
-		if (! this.headerVisible) { return; }
+		if (!this.headerVisible) { return; }
 		this.headerVisible = false;
 		var r = YAHOO.util.Dom.getRegion('header');
 		var anim = new YAHOO.util.Motion('header', { points: { to: [0, r.top - r.bottom] } }, 1);
