@@ -1,14 +1,16 @@
 body {
-  color: #777;
+  color: #888;
   background-color: #000;
-  font-family: sans-serif;
+  font-family: "Bitstream Vera Sans",Verdana,sans-serif;
   line-height: 150%;
+  text-align: justify;
 }
 
-h1 { 
-  color: #ccc;
+h1, h2, h3, h4 { 
+  color: #bbb;
   background-color: #000;
 }
+
 
 a { 
   color: #77F;
@@ -18,4 +20,9 @@ a {
 a:visited { 
   color: #F7F;
   background-color: #000;
+}
+
+code, pre {
+  font-family: "Consolas","Andale Mono","Courier New",monospace;
+  font-size: small;
 }
