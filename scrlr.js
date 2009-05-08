@@ -38,6 +38,8 @@ var Scrlr = function() {
 	this.keywordHistory = [];
 	this.lastQueryTime = 0;
 	this.lastImgQueryTime = 0;
+	this.lastQuery = "";
+	this.lastImgQuery = "";
 	this.headerVisible = true;
 	this.lastHeaderShowTime = new Date().getTime();
 	this.mouseInHeader = false;
@@ -49,7 +51,7 @@ Scrlr.prototype = {
 		YUE.addListener(["header", "mouseCaptureArea"], "mouseover", this.onMouseoverHeader, this, true);
 		YUE.addListener(["header", "mouseCaptureArea"], "mouseout", this.onMouseoutHeader, this, true);
 		this.polling = new Polling(this.tick.bind(this), this.interval);
-		this.polling.run();
+		this.runScrlr();
 		var p = new Polling(this.checkHideHeader.bind(this), 2000);
 		p.run();
     },
@@ -100,18 +102,22 @@ Scrlr.prototype = {
     runScrlr : function() {
 		if (this.polling.running) { return; }
 		this.polling.run();
-		document.getElementById("status").style.color = "#888";
-		document.getElementById("status").style.textDecoration = "none";
-		document.getElementById("status").innerHTML = "&gt;&gt;";
+		var s = document.getElementById("status");
+		s.style.color = "#fff";
+		s.style.textDecoration = "none";
+		s.innerHTML = "&gt;&gt;";
+		s.title = "Click to PAUSE";
     },
 
     stopScrlr : function() {
 		this.showHeader();
 		if (! this.polling.running) { return; }
 		this.polling.stop();
-		document.getElementById("status").style.color = "#f00";
-		document.getElementById("status").style.textDecoration = "blink";
-		document.getElementById("status").innerHTML = "||";
+		var s = document.getElementById("status");
+		s.style.color = "#f00";
+		s.style.textDecoration = "blink";
+		s.innerHTML = "||";
+		s.title = "Click to PLAY";
     },
 
 	keywordFromPanels : function() {
@@ -176,10 +182,12 @@ Scrlr.prototype = {
 		var now = new Date();
 		if (shortQueue && now.getTime() - this.lastQueryTime >= 30000) {
 			this.showHeader();
+			this.lastQuery = q;
 			webSearch(q);
 		}
 		if (shortImgQueue && now.getTime() - this.lastImgQueryTime >= 30000) {
 			this.showHeader();
+			this.lastImgQuery = q;
 			imgSearch(q);
 		}
 	},
@@ -220,7 +228,7 @@ Scrlr.prototype = {
 		var page = this.queue.shift();
 		var top = (panels.length > 0 ? max(panels[panels.length-1].bottom+1, this.viewportHeight) :
 				   this.viewportHeight);
-		panel.init(panelWidth, left, top, page.title, page.snipet, page.url);
+		panel.init(page.query, panelWidth, left, top, page.title, page.snipet, page.url);
 		panels.push(panel);
 		var scrollDelta = panel.getRealHeight();
 		var n = panels.length;
@@ -240,7 +248,7 @@ Scrlr.prototype = {
 			page = this.imgQueue.shift();
 			top = (imgPanels.length > 0 ? max(imgPanels[imgPanels.length-1].bottom+1, this.viewportHeight) :
 				   this.viewportHeight);
-			panel.init(panelWidth, center+left, top, page.title, page.snipet, page.url,
+			panel.init(page.query, panelWidth, center+left, top, page.title, page.snipet, page.url,
 					   page.refererUrl, page.width, page.height);
 			imgPanels.push(panel);
 			scrollDelta = panel.getRealHeight();
@@ -266,7 +274,8 @@ var webSearchCallback = function(jsonData) {
 	for (var i = 0; i < n; i++) {
 		ret.push({ title : results[i].Title,
 				   snipet : results[i].Summary,
-				   url : results[i].Url
+				   url : results[i].Url,
+				   query : scrlr.lastQuery
 				 });
 	}
 	scrlr.queue = scrlr.queue.concat(ret);
@@ -285,7 +294,8 @@ var imgSearchCallback = function(jsonData) {
 				   url : results[i].Thumbnail.Url,
 				   refererUrl : results[i].RefererUrl,
 				   height : parseInt(results[i].Thumbnail.Height, 10),
-				   width : parseInt(results[i].Thumbnail.Width, 10)
+				   width : parseInt(results[i].Thumbnail.Width, 10),
+				   query : scrlr.lastImgQuery
 				 });
 	}
 	scrlr.imgQueue = scrlr.imgQueue.concat(ret);

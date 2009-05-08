@@ -6,7 +6,8 @@ var Panel = function(scrlr) {
 	this.scrlr = scrlr;
 };
 Panel.prototype = {
-	init : function	(width, left, top, title, snipet, url, refererUrl, imgWidth, imgHeight) {
+	init : function	(query, width, left, top, title, snipet, url, refererUrl, imgWidth, imgHeight) {
+		this.query = query;
 		this.title = title;
 		this.snipet = snipet;
 		this.url = url;
@@ -41,7 +42,7 @@ Panel.prototype = {
 									parseInt(YAHOO.util.Dom.getStyle(this.element, 'marginLeft'), 10) -
 									parseInt(YAHOO.util.Dom.getStyle(this.element, 'marginRight'), 10)
 								   ) + "px";
-		this.element.title = this.clickUrl;
+		this.element.title = '\u201C' + this.query + "\u201D \u2192 " + this.clickUrl;
 		
 		this.left = top;
 		this.style.left = left + "px";
@@ -69,6 +70,13 @@ Panel.prototype = {
 	onClick : function(e) {
 		try {
 			this.scrlr.stopScrlr();
+			if (this.imgElement !== undefined) {
+				window.open("http://images.search.yahoo.com/search/images?ei=UTF-8&p=" +
+							encodeURIComponent(this.query), "search");
+			} else {
+				window.open("http://search.yahoo.co.jp/search?ei=UTF-8&p=" +
+							encodeURIComponent(this.query), "search");
+			}
 			window.open(this.clickUrl);
 		} catch (ex) {
 			// do nothing

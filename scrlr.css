@@ -37,15 +37,24 @@ div#header {
   z-index: 100;
 }
 
-span#scrlr, span#status {
-  color: #bbb;
+#scrlr, #status {
+  color: #fff;
   background-color: #000;
 }
 
-span#status {
+#status:hover {
+  color: #fff;
+  background-color: #333;
+}
+
+#status {
   font-weight: bold;
   font-family: "Consolas","Andale Mono","Courier New",monospace;
-  margin-right: 1em;
+}
+
+#help { 
+  margin-left: 1em;
+  font-size: small;
 }
 
 div#spinner_space { 
