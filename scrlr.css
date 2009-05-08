@@ -11,8 +11,18 @@ body {
 }
 
 a { 
+  color: #bbb;
+  background-color: #000;
+}
+
+a:visited { 
   color: #888;
   background-color: #000;
+}
+
+a:hover { 
+  color: #bbb;
+  background-color: #333;
 }
 
 div#header {
