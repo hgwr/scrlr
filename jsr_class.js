@@ -56,7 +56,6 @@ JSONscriptRequest.scriptCounter = 1;
 // buildScriptTag method
 //
 JSONscriptRequest.prototype.buildScriptTag = function () {
-
     // Create the script tag
     this.scriptObj = document.createElement("script");
     
@@ -66,7 +65,7 @@ JSONscriptRequest.prototype.buildScriptTag = function () {
     this.scriptObj.setAttribute("src", this.fullUrl + this.noCacheIE);
     this.scriptObj.setAttribute("id", this.scriptId);
 };
- 
+
 // removeScriptTag method
 // 
 JSONscriptRequest.prototype.removeScriptTag = function () {

@@ -1,17 +1,29 @@
+var YDOM = YAHOO.util.Dom;
+var YUE = YAHOO.util.Event;
+
 function max(a, b) { return (a > b) ? a : b; }
 function min(a, b) { return (a > b) ? b : a; }
 
+function ignore_exception() {
+    var args = Array.from(arguments), func = args.shift();
+    try {
+        return func.apply(func.this, args);
+    } catch (e) {
+        /* do nothing */
+    }
+}
+
 var SYMBOLS_RE = new RegExp('^[ 　!-/\\[\\]\\\\\\^_`{|}~、。！？（）「」『』]+$');
 var keywordFilter = function(keywords) {
-	var ret = [];
-	var n = keywords.length;
-	for (var i = 0; i < n; i++) {
-		var k = keywords[i];
-		if (k.length >= 2 && ! k.match(SYMBOLS_RE)) {
-		    ret.push(k);
-		}	
-	}
-	return ret;
+    var ret = [];
+    var n = keywords.length;
+    for (var i = 0; i < n; i++) {
+        var k = keywords[i];
+        if (k.length >= 2 && ! k.match(SYMBOLS_RE)) {
+            ret.push(k);
+        }
+    }
+    return ret;
 };
 
 /*
@@ -36,20 +48,20 @@ Array.prototype.uniq = function(){
 Array.from = function(iterable){
     if (!iterable) { return []; }
     if (iterable.toArray) {
-		return iterable.toArray();
+        return iterable.toArray();
     } else {
-		var results = [];
-		for (var i = 0, length = iterable.length; i < length; i++) {
-			results.push(iterable[i]);
-		}
-		return results;
+        var results = [];
+        for (var i = 0, length = iterable.length; i < length; i++) {
+            results.push(iterable[i]);
+        }
+        return results;
     }
 };
 Function.prototype.bind = function() {
-	var __method = this, args = Array.from(arguments), object = args.shift();
-	return function() {
-		return __method.apply(object, args.concat(Array.from(arguments)));
-	};
+    var __method = this, args = Array.from(arguments), object = args.shift();
+    return function() {
+        return __method.apply(object, args.concat(Array.from(arguments)));
+    };
 };
 
 //+ Jonas Raoni Soares Silva

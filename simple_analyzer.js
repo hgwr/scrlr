@@ -12,17 +12,17 @@ function SimpleAnalyzer() {
 
 SimpleAnalyzer.prototype.parse = function(str) {
     if (typeof(str) == "string") {
-		var s = str.replace(this.joshi, "$1|");
-		var ary = s.split("|");
-		var result = [];
-		for (var i = 0, max_i = ary.length; i < max_i; i++) {
-			var token = ary[i].match(this.re);
-			if (token) {
-				for (var n = 0, max_n = token.length; n < max_n; n++) {
-					result.push(token[n]);
-				}
-			}
-		}
-		return result;
+        var s = str.replace(this.joshi, "$1|");
+        var ary = s.split("|");
+        var result = [];
+        for (var i = 0, max_i = ary.length; i < max_i; i++) {
+            var token = ary[i].match(this.re);
+            if (token) {
+                for (var n = 0, max_n = token.length; n < max_n; n++) {
+                    result.push(token[n]);
+                }
+            }
+        }
+        return result;
     }
 };

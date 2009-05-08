@@ -10,17 +10,17 @@ body {
   text-align: justify;
 }
 
-a { 
+a {
   color: #bbb;
   background-color: #000;
 }
 
-a:visited { 
+a:visited {
   color: #888;
   background-color: #000;
 }
 
-a:hover { 
+a:hover {
   color: #bbb;
   background-color: #333;
 }
@@ -52,23 +52,23 @@ div#header {
   font-family: "Consolas","Andale Mono","Courier New",monospace;
 }
 
-#help { 
+#help {
   margin-left: 1em;
   font-size: small;
 }
 
-div#spinner_space { 
+div#spinner_space {
   width: 16px;
   height: 16px;
 }
 
 img#spinner {
   display: none;
-  vertical-align: bottom;                          
+  vertical-align: bottom;
 }
 
-div#header a, div#header span, div#header img { 
-  vertical-align: bottom;                          
+div#header a, div#header span, div#header img {
+  vertical-align: bottom;
 }
 
 div#mouseCaptureArea {
@@ -91,7 +91,7 @@ div#canvas {
   z-index: 10;
 }
 
-div.panel { 
+div.panel {
   position: absolute;
   padding: 10px;
   margin: 0px 0px 10px 0px;
