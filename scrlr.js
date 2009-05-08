@@ -45,7 +45,7 @@ var Scrlr = function() {
 Scrlr.prototype = {
     onLoad : function() {
 		this.canvas = document.getElementById("canvas");
-		YUE.addListener(["scrlr", "header", "canvas"], "click", this.onScrlrClick, this, true);
+		YUE.addListener("header", "click", this.onScrlrClick, this, true);
 		YUE.addListener(["header", "mouseCaptureArea"], "mouseover", this.onMouseoverHeader, this, true);
 		YUE.addListener(["header", "mouseCaptureArea"], "mouseout", this.onMouseoutHeader, this, true);
 		this.polling = new Polling(this.tick.bind(this), this.interval);
@@ -64,7 +64,6 @@ Scrlr.prototype = {
 	},
 
     onScrlrClick : function(e) {
-		this.showHeader();
 		if (this.polling.running) {
 			this.stopScrlr();
 		} else {
@@ -107,6 +106,7 @@ Scrlr.prototype = {
     },
 
     stopScrlr : function() {
+		this.showHeader();
 		if (! this.polling.running) { return; }
 		this.polling.stop();
 		document.getElementById("status").style.color = "#f00";
@@ -190,6 +190,7 @@ Scrlr.prototype = {
 		if (panels.length > 0) {
 			if (panels[0].bottom <= 0) {
 				this.canvas.removeChild(panels[0].element);
+				YUE.purgeElement(panels[0].element, true);
 				panels.shift();
 			}
 		}
@@ -197,6 +198,7 @@ Scrlr.prototype = {
 		if (imgPanels.length > 0) {
 			if (imgPanels[0].bottom <= 0) {
 				this.canvas.removeChild(imgPanels[0].element);
+				YUE.purgeElement(imgPanels[0].element);
 				imgPanels.shift();
 			}
 		}
@@ -213,7 +215,7 @@ Scrlr.prototype = {
 		var left = (center * 0.1) / 2 ;
 
 		// ウェブページのほう
-		var panel = new Panel();
+		var panel = new Panel(this);
 		this.canvas.appendChild(panel.element);
 		var page = this.queue.shift();
 		var top = (panels.length > 0 ? max(panels[panels.length-1].bottom+1, this.viewportHeight) :
@@ -233,7 +235,7 @@ Scrlr.prototype = {
 		
 		// 画像のほう
 		if (this.imgQueue.length > 0) {
-			panel = new Panel();
+			panel = new Panel(this);
 			this.canvas.appendChild(panel.element);
 			page = this.imgQueue.shift();
 			top = (imgPanels.length > 0 ? max(imgPanels[imgPanels.length-1].bottom+1, this.viewportHeight) :

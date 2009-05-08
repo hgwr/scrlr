@@ -99,6 +99,7 @@ div.panel {
 div.panel img {
   float: left;
   margin-right: 5px;
+  z-index: 55;
 }
 
 div.panel div.title {
@@ -108,10 +109,12 @@ div.panel div.title {
   font-size: 150%;
   line-height: 150%;
   text-align: justify;
+  z-index: 55;
 }
 
 div.panel div.snipet {
   font-size: 125%;
   line-height: 150%;
   text-align: justify;
+  z-index: 55;
 }

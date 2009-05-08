@@ -1,8 +1,9 @@
-var Panel = function() {
+var Panel = function(scrlr) {
     this.element = document.createElement("div");
-    this.element.className = "panel";
-	this.element.innerHTML = "";
+	this.element.className = "panel";
+    this.element.innerHTML = "";
     this.style = this.element.style;
+	this.scrlr = scrlr;
 };
 Panel.prototype = {
 	init : function	(width, left, top, title, snipet, url, refererUrl, imgWidth, imgHeight) {
@@ -67,9 +68,10 @@ Panel.prototype = {
 	},
 	onClick : function(e) {
 		try {
-			window.open(this.clickUrl, null);
+			this.scrlr.stopScrlr();
+			window.open(this.clickUrl);
 		} catch (ex) {
-			
+			// do nothing
 		}
 	},
 	onMouseover : function(e) {
