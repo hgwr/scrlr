@@ -301,4 +301,4 @@ var imgSearchCallback = function(jsonData) {
     imgSearchJsonpRequest.removeScriptTag();
 };
 
-YUE.onDOMReady(scrlr.onLoad.bind(scrlr));
+YAHOO.util.Event.onDOMReady(scrlr.onLoad.bind(scrlr));

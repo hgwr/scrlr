@@ -78,8 +78,8 @@ Panel.prototype = {
         } else {
             urlPrefix = "http://search.yahoo.co.jp/search?ei=UTF-8&p=";
         }
-        ignore_exception(window.open, urlPrefix + encodeURIComponent(this.query), "search");
-        ignore_exception(window.open, this.clickUrl);
+        ignore_exception(window, window.open, urlPrefix + encodeURIComponent(this.query), "search");
+        ignore_exception(window, window.open, this.clickUrl);
     },
 
     onMouseover : function(e) {
