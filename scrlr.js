@@ -18,7 +18,7 @@ var liveSearch = function(q) {
     displaySearchStart(q);
     var url = "http://api.search.live.net/json.aspx?AppId=" + APPID_L +
         "&Market=ja-JP&Query=" + encodeURIComponent(q) +
-        "&Sources=Web+Image&Web.Count=5&Image.Count=3&JsonType=callback&JsonCallback=liveSearchCallback";
+        "&Sources=Web+Image&Web.Count=6&Image.Count=3&JsonType=callback&JsonCallback=liveSearchCallback";
     liveSearchJsonpRequest = new JSONscriptRequest(url);
     liveSearchJsonpRequest.buildScriptTag();
     liveSearchJsonpRequest.addScriptTag();
@@ -28,7 +28,7 @@ var yahooWebSearchJsonpRequest = null;
 var yahooWebSearch = function(q) {
     displaySearchStart(q);
     var url = "http://search.yahooapis.jp/WebSearchService/V1/webSearch?appid=" + APPID_Y +
-        "&query=" + encodeURIComponent(q) + "&results=5&output=json&callback=yahooWebSearchCallback";
+        "&query=" + encodeURIComponent(q) + "&results=6&output=json&callback=yahooWebSearchCallback";
     yahooWebSearchJsonpRequest = new JSONscriptRequest(url);
     yahooWebSearchJsonpRequest.buildScriptTag();
     yahooWebSearchJsonpRequest.addScriptTag();
@@ -45,7 +45,7 @@ var yahooImgSearch = function(q) {
 };
 
 var Scrlr = function() {
-    this.interval = 8 * 1000;
+    this.interval = 12 * 1000;
     this.s = new SimpleAnalyzer();
     this.webQueue = [];
     this.imgQueue = [];
@@ -66,7 +66,7 @@ Scrlr.prototype = {
         YUE.addListener(["header", "mouseCaptureArea"], "mouseout", this.onMouseoutHeader, this, true);
         this.polling = new Polling(this.tick.bind(this), this.interval);
         this.runScrlr();
-        var p = new Polling(this.checkHideHeader.bind(this), 2000);
+        var p = new Polling(this.checkHideHeader.bind(this), 1000);
         p.run();
     },
 
@@ -74,7 +74,7 @@ Scrlr.prototype = {
         if (!this.mouseInHeader &&
             this.polling.running &&
             this.headerVisible &&
-            new Date().getTime() - this.lastHeaderShowTime >= 10000) {
+            new Date().getTime() - this.lastHeaderShowTime >= 12000) {
             this.hideHeader();
         }
     },
@@ -189,7 +189,7 @@ Scrlr.prototype = {
                 if (y < 2000) { y += 1900; }
                 if (m < 10) { m = "0" + m; }
                 if (d < 10) { d = "0" + d; }
-                q = y + "年" + m + "月" + d + "日";
+                q = y + "-" + m + "-" + d + "-";
             }
         }
 
@@ -212,7 +212,6 @@ Scrlr.prototype = {
         }
     },
 
-    /* 定期的に呼ばれる関数 */
     tick : function() {
         document.getElementById("spinner").style.display = "none";
 
@@ -372,7 +371,7 @@ var jsonFlickrApi = function(jsonData) {
                    height : null,
                    width : null,
                    query : scrlr.lastQuery.img,
-                   searchUrl : ("http://www.flickr.com/search/?w=all&m=text&q=" +
+                   searchUrl : ("http://www.flickr.com/search/?w=all&m=text&s=int&q=" +
                                 encodeURIComponent(scrlr.lastQuery.img))
                  });
     }

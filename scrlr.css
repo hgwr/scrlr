@@ -65,9 +65,7 @@ div.panel {
   position: absolute;
   padding: 10px;
   margin: 0px 0px 10px 0px;
-  border-width: 0px 0px 0px 0px;
-  border-style: solid;
-  border-color: #888;
+  border-width: 0px;
   line-height: 150%;
   text-align: justify;
   color: #888;
