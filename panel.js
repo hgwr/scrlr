@@ -6,8 +6,9 @@ var Panel = function(scrlr) {
     this.scrlr = scrlr;
 };
 Panel.prototype = {
-    init : function (query, width, left, top, title, snipet, url, refererUrl, imgWidth, imgHeight) {
+    init : function (query, searchUrl, width, left, top, title, snipet, url, refererUrl, imgWidth, imgHeight) {
         this.query = query;
+        this.searchUrl = searchUrl;
         this.title = title;
         this.snipet = snipet;
         this.url = url;
@@ -72,13 +73,7 @@ Panel.prototype = {
 
     onClick : function(e) {
         this.scrlr.stopScrlr();
-        var urlPrefix = "";
-        if (this.imgElement !== undefined) {
-            urlPrefix = "http://images.search.yahoo.com/search/images?ei=UTF-8&p=";
-        } else {
-            urlPrefix = "http://search.yahoo.co.jp/search?ei=UTF-8&p=";
-        }
-        ignore_exception(window, window.open, urlPrefix + encodeURIComponent(this.query), "search");
+        ignore_exception(window, window.open, this.searchUrl, "search");
         ignore_exception(window, window.open, this.clickUrl);
     },
 

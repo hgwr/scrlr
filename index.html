@@ -4,7 +4,8 @@
 <meta http-equiv="Content-Script-Type" content="text/javascript">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="keywords" content="scrlr,scroller">
-<meta name="description" content="Scrlr (スクローラー) は、ニュースやウェブを自動でスクロールして眺めるためのソフトウェアです。">
+<meta name="description" content="Scrlr (スクローラー) は、ウェブを自動でスクロールして眺めるためのページです。">
+<link rel="stylesheet" type="text/css" href="docs.css">
 <link rel="stylesheet" type="text/css" href="scrlr.css">
 <script type="text/javascript" charset="utf-8" src="yui_2.7.0/yahoo-dom-event.js"></script>
 <script type="text/javascript" charset="utf-8" src="yui_2.7.0/animation-min.js"></script>
@@ -24,23 +25,25 @@
 <td style="text-align: left" width="20%">
 <span id="scrlr" title="スクローラー">Scrlr</span>
 <noscript><p>このページを見るためには、 JavaScript が必要です。</p></noscript>
-[<span id="status">&gt;&gt;</span>]
+[<span id="status" class="status">&gt;&gt;</span>]
 <a id="help" href="help.html" target="help">Help</a>
 </td>
 <td style="text-align: right" width="10%">
-<div id="spinner_space"><img id="spinner" alt="" src="ajax-loader.gif"></div>
+<div id="spinnerSpace"><img id="spinner" alt="" src="ajax-loader.gif"></div>
 </td>
 <td style="text-align: left" width="20%">
 <span>&ldquo;</span><span id="key"></span><span>&rdquo;</span>
 </td>
 <td style="text-align: right">
-<a href="http://developer.yahoo.com/search/image/V1/imageSearch.html"
-  style="font-size: small" target="yahoo">Powered by Yahoo! Image Search</a>
-<a href="http://developer.yahoo.co.jp/about" target="yahoo">
+<div style="font-size: small">Powered by
+<a href="http://dev.live.com/livesearch/" target="powered_by">Live Search</a>, 
+<a href="http://developer.yahoo.com/search/image/V1/imageSearch.html" target="powered_by">Yahoo! Image Search</a>
+<a href="http://developer.yahoo.co.jp/about" target="powered_by">
 <img src="http://i.yimg.jp/images/yjdn/yjdn_attbtn1_125_17.gif"
   title="Webサービス by Yahoo! JAPAN" alt="Web Services by Yahoo! JAPAN"
   width="125" height="17" border="0">
 </a>
+</div>
 </td>
 </tr>
 </table>

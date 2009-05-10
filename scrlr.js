@@ -5,37 +5,48 @@ var displaySearchStart = function(q) {
         '" target="_blank">' + q + '</a>';
 };
 
-var webSearchJsonpRequest = null;
-var webSearch = function(q) {
-    var url = "http://search.yahooapis.jp/WebSearchService/V1/webSearch?appid=" + APPID_Y +
-        "&query=" + encodeURIComponent(q) + "&results=10&output=json&callback=webSearchCallback";
+var liveSearchJsonpRequest = null;
+var liveSearch = function(q) {
     displaySearchStart(q);
-    webSearchJsonpRequest = new JSONscriptRequest(url);
-    webSearchJsonpRequest.buildScriptTag();
-    webSearchJsonpRequest.addScriptTag();
+    var url = "http://api.search.live.net/json.aspx?AppId=" + APPID_L +
+        "&Market=ja-JP&Query=" + encodeURIComponent(q) +
+        "&Sources=Web+Image&Web.Count=5&Image.Count=5&JsonType=callback&JsonCallback=liveSearchCallback";
+    liveSearchJsonpRequest = new JSONscriptRequest(url);
+    liveSearchJsonpRequest.buildScriptTag();
+    liveSearchJsonpRequest.addScriptTag();
 };
 
-var imgSearchJsonpRequest = null;
-var imgSearch = function(q) {
-    var url = "http://search.yahooapis.com/ImageSearchService/V1/imageSearch?appid=" + APPID_Y_US +
-        "&query=" + encodeURIComponent(q) + "&results=10&output=json&callback=imgSearchCallback";
+var yahooWebSearchJsonpRequest = null;
+var yahooWebSearch = function(q) {
     displaySearchStart(q);
-    imgSearchJsonpRequest = new JSONscriptRequest(url);
-    imgSearchJsonpRequest.buildScriptTag();
-    imgSearchJsonpRequest.addScriptTag();
+    var url = "http://search.yahooapis.jp/WebSearchService/V1/webSearch?appid=" + APPID_Y +
+        "&query=" + encodeURIComponent(q) + "&results=5&output=json&callback=yahooWebSearchCallback";
+    yahooWebSearchJsonpRequest = new JSONscriptRequest(url);
+    yahooWebSearchJsonpRequest.buildScriptTag();
+    yahooWebSearchJsonpRequest.addScriptTag();
+};
+
+var yahooImgSearchJsonpRequest = null;
+var yahooImgSearch = function(q) {
+    displaySearchStart(q);
+    var url = "http://search.yahooapis.com/ImageSearchService/V1/imageSearch?appid=" + APPID_Y_US +
+        "&query=" + encodeURIComponent(q) + "&results=5&output=json&callback=yahooImgSearchCallback";
+    yahooImgSearchJsonpRequest = new JSONscriptRequest(url);
+    yahooImgSearchJsonpRequest.buildScriptTag();
+    yahooImgSearchJsonpRequest.addScriptTag();
 };
 
 var Scrlr = function() {
     this.interval = 8 * 1000;
     this.s = new SimpleAnalyzer();
-    this.queue = [];
+    this.webQueue = [];
     this.imgQueue = [];
-    this.panels = [];
+    this.webPanels = [];
     this.imgPanels = [];
     this.keywordHistory = [];
-    this.lastQueryTime = 0;
+    this.lastWebQueryTime = 0;
     this.lastImgQueryTime = 0;
-    this.lastQuery = "";
+    this.lastWebQuery = "";
     this.lastImgQuery = "";
     this.headerVisible = true;
     this.lastHeaderShowTime = new Date().getTime();
@@ -119,9 +130,9 @@ Scrlr.prototype = {
 
     keywordFromPanels : function() {
         var text = "";
-        var n = this.panels.length;
+        var n = this.webPanels.length;
         for (var i = 0; i < n; i++) {
-            text += " " + this.panels[i].title + " " + this.panels[i].snipet;
+            text += " " + this.webPanels[i].title + " " + this.webPanels[i].snipet;
         }
         n = this.imgPanels.length;
         for (i = 0; i < n; i++) {
@@ -159,9 +170,9 @@ Scrlr.prototype = {
 
     prepareQueue : function () {
         var q = null;
-        var shortQueue = (this.queue.length <= 3);
+        var shortWebQueue = (this.webQueue.length <= 3);
         var shortImgQueue = (this.imgQueue.length <= 3);
-        if (shortQueue || shortImgQueue) {
+        if (shortWebQueue || shortImgQueue) {
             q = this.keywordFromPanels();
             if(q === undefined || q === null) {
                 var date = new Date();
@@ -172,31 +183,37 @@ Scrlr.prototype = {
                 if (y < 2000) { y += 1900; }
                 if (m < 10) { m = "0" + m; }
                 if (d < 10) { d = "0" + d; }
-                q = "news " + y + "-" + m + "-" + d;
+                q = y + "年" + m + "月" + d + "日";
             }
         }
 
         var now = new Date();
-        if (shortQueue && now.getTime() - this.lastQueryTime >= 30000) {
+        if ((shortWebQueue || shortImgQueue) && now.getTime() - this.lastWebQueryTime >= 30000) {
             this.showHeader();
-            this.lastQuery = q;
-            webSearch(q);
+            this.lastWebQuery = q;
+            this.lastImgQuery = q;
+            liveSearch(q);
+        }
+        if (shortWebQueue && now.getTime() - this.lastWebQueryTime >= 30000) {
+            this.showHeader();
+            this.lastWebQuery = q;
+            yahooWebSearch(q);
         }
         if (shortImgQueue && now.getTime() - this.lastImgQueryTime >= 30000) {
             this.showHeader();
             this.lastImgQuery = q;
-            imgSearch(q);
+            yahooImgSearch(q);
         }
     },
 
     /* 定期的に呼ばれる関数 */
     tick : function() {
-        var panels = this.panels;
-        if (panels.length > 0) {
-            if (panels[0].bottom <= 0) {
-                this.canvas.removeChild(panels[0].element);
-                YUE.purgeElement(panels[0].element, true);
-                panels.shift();
+        var webPanels = this.webPanels;
+        if (webPanels.length > 0) {
+            if (webPanels[0].bottom <= 0) {
+                this.canvas.removeChild(webPanels[0].element);
+                YUE.purgeElement(webPanels[0].element, true);
+                webPanels.shift();
             }
         }
         var imgPanels = this.imgPanels;
@@ -209,43 +226,39 @@ Scrlr.prototype = {
         }
 
         this.prepareQueue();
-        if (this.queue.length <= 0) {
-            return;
-        }
 
         this.viewportWidth = YDOM.getViewportWidth();
         this.viewportHeight = YDOM.getViewportHeight();
         var center = this.viewportWidth / 2;
         var panelWidth = center * 0.9;
         var left = (center * 0.1) / 2 ;
-
-        // ウェブページのほう
-        var panel = new Panel(this);
-        this.canvas.appendChild(panel.element);
-        var page = this.queue.shift();
-        var top = (panels.length > 0 ? max(panels[panels.length-1].bottom+1, this.viewportHeight) :
+        var panel, page, top, scrollDelta, n, i, destY, anim;
+        if (this.webQueue.length > 0) {
+            panel = new Panel(this);
+            this.canvas.appendChild(panel.element);
+            page = this.webQueue.shift();
+            top = (webPanels.length > 0 ? max(webPanels[webPanels.length-1].bottom+1, this.viewportHeight) :
                    this.viewportHeight);
-        panel.init(page.query, panelWidth, left, top, page.title, page.snipet, page.url);
-        panels.push(panel);
-        var scrollDelta = panel.getRealHeight();
-        var n = panels.length;
-        var i = 0;
-        for (i = 0; i < n; i++) {
-            var destY = panels[i].top - scrollDelta;
-            var anim = new YAHOO.util.Motion(panels[i].element, { points: { to: [left, destY] } }, 3);
-            anim.animate();
-            panels[i].top -= scrollDelta;
-            panels[i].bottom -= scrollDelta;
+            panel.init(page.query, page.searchUrl, panelWidth, left, top, page.title, page.snipet, page.url);
+            webPanels.push(panel);
+            scrollDelta = panel.getRealHeight();
+            n = webPanels.length;
+            i = 0;
+            for (i = 0; i < n; i++) {
+                destY = webPanels[i].top - scrollDelta;
+                anim = new YAHOO.util.Motion(webPanels[i].element, { points: { to: [left, destY] } }, 3);
+                anim.animate();
+                webPanels[i].top -= scrollDelta;
+                webPanels[i].bottom -= scrollDelta;
+            }
         }
-
-        // 画像のほう
         if (this.imgQueue.length > 0) {
             panel = new Panel(this);
             this.canvas.appendChild(panel.element);
             page = this.imgQueue.shift();
             top = (imgPanels.length > 0 ? max(imgPanels[imgPanels.length-1].bottom+1, this.viewportHeight) :
                    this.viewportHeight);
-            panel.init(page.query, panelWidth, center+left, top, page.title, page.snipet, page.url,
+            panel.init(page.query, page.searchUrl, panelWidth, center+left, top, page.title, page.snipet, page.url,
                        page.refererUrl, page.width, page.height);
             imgPanels.push(panel);
             scrollDelta = panel.getRealHeight();
@@ -264,7 +277,45 @@ Scrlr.prototype = {
 
 var scrlr = new Scrlr();
 
-var webSearchCallback = function(jsonData) {
+var liveSearchCallback = function(jsonData) {
+    var ret = [];
+    var results = jsonData.SearchResponse.Web.Results;
+    var n = results.length;
+    var i = 0;
+    for (i = 0; i < n; i++) {
+        ret.push({ title : results[i].Title,
+                   snipet : results[i].Description,
+                   url : results[i].Url,
+                   query : scrlr.lastWebQuery,
+                   searchUrl : 'http://search.live.com/results.aspx?q=' + encodeURIComponent(scrlr.lastWebQuery)
+                 });
+    }
+    scrlr.webQueue = scrlr.webQueue.concat(ret);
+    scrlr.lastWebQueryTime = new Date().getTime();
+
+    ret = [];
+    results = jsonData.SearchResponse.Image.Results;
+    n = results.length;
+    for (i = 0; i < n; i++) {
+        ret.push({ title : results[i].Title,
+                   snipet : '',
+                   url : results[i].Thumbnail.Url,
+                   refererUrl : results[i].Url,
+                   height : parseInt(results[i].Thumbnail.Height, 10),
+                   width : parseInt(results[i].Thumbnail.Width, 10),
+                   query : scrlr.lastImgQuery,
+                   searchUrl : ('http://search.live.com/images/results.aspx?scope=images&q=' +
+                                encodeURIComponent(scrlr.lastImgQuery))
+                 });
+    }
+    scrlr.imgQueue = scrlr.imgQueue.concat(ret);
+    scrlr.lastImgQueryTime = new Date().getTime();
+
+    document.getElementById("spinner").style.display = "none";
+    liveSearchJsonpRequest.removeScriptTag();
+};
+
+var yahooWebSearchCallback = function(jsonData) {
     var ret = [];
     var results = jsonData.ResultSet.Result;
     var n = results.length;
@@ -272,16 +323,17 @@ var webSearchCallback = function(jsonData) {
         ret.push({ title : results[i].Title,
                    snipet : results[i].Summary,
                    url : results[i].Url,
-                   query : scrlr.lastQuery
+                   query : scrlr.lastWebQuery,
+                   searchUrl : "http://search.yahoo.co.jp/search?ei=UTF-8&p=" + encodeURIComponent(scrlr.lastWebQuery)
                  });
     }
-    scrlr.queue = scrlr.queue.concat(ret);
-    scrlr.lastQueryTime = new Date().getTime();
+    scrlr.webQueue = scrlr.webQueue.concat(ret);
+    scrlr.lastWebQueryTime = new Date().getTime();
     document.getElementById("spinner").style.display = "none";
-    webSearchJsonpRequest.removeScriptTag();
+    yahooWebSearchJsonpRequest.removeScriptTag();
 };
 
-var imgSearchCallback = function(jsonData) {
+var yahooImgSearchCallback = function(jsonData) {
     var ret = [];
     var results = jsonData.ResultSet.Result;
     var n = results.length;
@@ -292,13 +344,15 @@ var imgSearchCallback = function(jsonData) {
                    refererUrl : results[i].RefererUrl,
                    height : parseInt(results[i].Thumbnail.Height, 10),
                    width : parseInt(results[i].Thumbnail.Width, 10),
-                   query : scrlr.lastImgQuery
+                   query : scrlr.lastImgQuery,
+                   searchUrl : ("http://images.search.yahoo.com/search/images?ei=UTF-8&p=" + 
+                                encodeURIComponent(scrlr.lastImgQuery))
                  });
     }
     scrlr.imgQueue = scrlr.imgQueue.concat(ret);
     scrlr.lastImgQueryTime = new Date().getTime();
     document.getElementById("spinner").style.display = "none";
-    imgSearchJsonpRequest.removeScriptTag();
+    yahooImgSearchJsonpRequest.removeScriptTag();
 };
 
 YAHOO.util.Event.onDOMReady(scrlr.onLoad.bind(scrlr));

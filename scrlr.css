@@ -2,27 +2,6 @@ body {
   overflow: hidden;
   padding: 0px;
   margin: 0px;
-  border: #000 0px solid;
-  color: #888;
-  background-color: #000;
-  font-family: "Bitstream Vera Sans",Verdana,sans-serif;
-  line-height: 150%;
-  text-align: justify;
-}
-
-a {
-  color: #bbb;
-  background-color: #000;
-}
-
-a:visited {
-  color: #888;
-  background-color: #000;
-}
-
-a:hover {
-  color: #bbb;
-  background-color: #333;
 }
 
 div#header {
@@ -37,19 +16,9 @@ div#header {
   z-index: 100;
 }
 
-#scrlr, #status {
+#scrlr {
   color: #fff;
   background-color: #000;
-}
-
-#status:hover {
-  color: #fff;
-  background-color: #333;
-}
-
-#status {
-  font-weight: bold;
-  font-family: "Consolas","Andale Mono","Courier New",monospace;
 }
 
 #help {
@@ -57,7 +26,7 @@ div#header {
   font-size: small;
 }
 
-div#spinner_space {
+div#spinnerSpace {
   width: 16px;
   height: 16px;
 }

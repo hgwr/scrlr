@@ -1,4 +1,5 @@
 body {
+  border: #000 0px solid;
   color: #888;
   background-color: #000;
   font-family: "Bitstream Vera Sans",Verdana,sans-serif;
@@ -6,22 +7,22 @@ body {
   text-align: justify;
 }
 
-h1, h2, h3, h4 { 
+h1, h2, h3, h4 {
   color: #bbb;
   background-color: #000;
 }
 
-a { 
+a {
   color: #bbb;
   background-color: #000;
 }
 
-a:visited { 
+a:visited {
   color: #888;
   background-color: #000;
 }
 
-a:hover { 
+a:hover {
   color: #bbb;
   background-color: #333;
 }
@@ -29,4 +30,26 @@ a:hover {
 code, pre {
   font-family: "Consolas","Andale Mono","Courier New",monospace;
   font-size: small;
+}
+
+span.status {
+  font-weight: bold;
+  font-family: "Consolas","Andale Mono","Courier New",monospace;
+}
+
+span.status:hover {
+  color: #fff;
+  background-color: #333;
+}
+
+span.play {
+  color: #fff;
+  background-color: #000;
+  text-decoration: none;
+}
+
+span.pause {
+  color: #f00;
+  background-color: #000;
+  text-decoration: blink;
 }
