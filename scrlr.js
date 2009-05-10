@@ -1,8 +1,16 @@
 var displaySearchStart = function(q) {
+    document.getElementById("searchLog").innerHTML = "&ldquo;" + q + "&rdquo; was searched.";
     document.getElementById("spinner").style.display = "inline";
-    document.getElementById("key").innerHTML = '<a href="' +
-        "http://search.yahoo.co.jp/search?ei=UTF-8&p=" + encodeURIComponent(q) +
-        '" target="_blank">' + q + '</a>';
+};
+
+var flickrImgSearchJsonpRequest = null;
+var flickrImgSearch = function(q) {
+    displaySearchStart(q);
+    var url = "http://www.flickr.com/services/rest/?method=flickr.photos.search&format=json&api_key=" + APPID_F +
+        "&content_type=1&per_page=5&text=" + encodeURIComponent(q);
+    flickrImgSearchJsonpRequest = new JSONscriptRequest(url);
+    flickrImgSearchJsonpRequest.buildScriptTag();
+    flickrImgSearchJsonpRequest.addScriptTag();
 };
 
 var liveSearchJsonpRequest = null;
@@ -10,7 +18,7 @@ var liveSearch = function(q) {
     displaySearchStart(q);
     var url = "http://api.search.live.net/json.aspx?AppId=" + APPID_L +
         "&Market=ja-JP&Query=" + encodeURIComponent(q) +
-        "&Sources=Web+Image&Web.Count=5&Image.Count=5&JsonType=callback&JsonCallback=liveSearchCallback";
+        "&Sources=Web+Image&Web.Count=5&Image.Count=3&JsonType=callback&JsonCallback=liveSearchCallback";
     liveSearchJsonpRequest = new JSONscriptRequest(url);
     liveSearchJsonpRequest.buildScriptTag();
     liveSearchJsonpRequest.addScriptTag();
@@ -30,7 +38,7 @@ var yahooImgSearchJsonpRequest = null;
 var yahooImgSearch = function(q) {
     displaySearchStart(q);
     var url = "http://search.yahooapis.com/ImageSearchService/V1/imageSearch?appid=" + APPID_Y_US +
-        "&query=" + encodeURIComponent(q) + "&results=5&output=json&callback=yahooImgSearchCallback";
+        "&query=" + encodeURIComponent(q) + "&results=3&output=json&callback=yahooImgSearchCallback";
     yahooImgSearchJsonpRequest = new JSONscriptRequest(url);
     yahooImgSearchJsonpRequest.buildScriptTag();
     yahooImgSearchJsonpRequest.addScriptTag();
@@ -44,10 +52,8 @@ var Scrlr = function() {
     this.webPanels = [];
     this.imgPanels = [];
     this.keywordHistory = [];
-    this.lastWebQueryTime = 0;
-    this.lastImgQueryTime = 0;
-    this.lastWebQuery = "";
-    this.lastImgQuery = "";
+    this.lastQuery = { web : '', img : '', live : '' };
+    this.lastQueryTime = { web : 0, img : 0, live : 0 };
     this.headerVisible = true;
     this.lastHeaderShowTime = new Date().getTime();
     this.mouseInHeader = false;
@@ -188,26 +194,28 @@ Scrlr.prototype = {
         }
 
         var now = new Date();
-        if ((shortWebQueue || shortImgQueue) && now.getTime() - this.lastWebQueryTime >= 30000) {
+        if (shortWebQueue && now.getTime() - this.lastQueryTime.web >= 30000) {
             this.showHeader();
-            this.lastWebQuery = q;
-            this.lastImgQuery = q;
-            liveSearch(q);
-        }
-        if (shortWebQueue && now.getTime() - this.lastWebQueryTime >= 30000) {
-            this.showHeader();
-            this.lastWebQuery = q;
+            this.lastQuery.web = q;
             yahooWebSearch(q);
         }
-        if (shortImgQueue && now.getTime() - this.lastImgQueryTime >= 30000) {
+        if (shortImgQueue && now.getTime() - this.lastQueryTime.img >= 30000) {
             this.showHeader();
-            this.lastImgQuery = q;
+            this.lastQuery.img = q;
+            flickrImgSearch(q);
             yahooImgSearch(q);
+        }
+        if ((shortWebQueue || shortImgQueue) && now.getTime() - this.lastQueryTime.live >= 30000) {
+            this.showHeader();
+            this.lastQuery.live = q;
+            liveSearch(q);
         }
     },
 
     /* 定期的に呼ばれる関数 */
     tick : function() {
+        document.getElementById("spinner").style.display = "none";
+
         var webPanels = this.webPanels;
         if (webPanels.length > 0) {
             if (webPanels[0].bottom <= 0) {
@@ -286,12 +294,11 @@ var liveSearchCallback = function(jsonData) {
         ret.push({ title : results[i].Title,
                    snipet : results[i].Description,
                    url : results[i].Url,
-                   query : scrlr.lastWebQuery,
-                   searchUrl : 'http://search.live.com/results.aspx?q=' + encodeURIComponent(scrlr.lastWebQuery)
+                   query : scrlr.lastQuery.live,
+                   searchUrl : 'http://search.live.com/results.aspx?q=' + encodeURIComponent(scrlr.lastQuery.live)
                  });
     }
     scrlr.webQueue = scrlr.webQueue.concat(ret);
-    scrlr.lastWebQueryTime = new Date().getTime();
 
     ret = [];
     results = jsonData.SearchResponse.Image.Results;
@@ -303,15 +310,14 @@ var liveSearchCallback = function(jsonData) {
                    refererUrl : results[i].Url,
                    height : parseInt(results[i].Thumbnail.Height, 10),
                    width : parseInt(results[i].Thumbnail.Width, 10),
-                   query : scrlr.lastImgQuery,
+                   query : scrlr.lastQuery.live,
                    searchUrl : ('http://search.live.com/images/results.aspx?scope=images&q=' +
-                                encodeURIComponent(scrlr.lastImgQuery))
+                                encodeURIComponent(scrlr.lastQuery.live))
                  });
     }
     scrlr.imgQueue = scrlr.imgQueue.concat(ret);
-    scrlr.lastImgQueryTime = new Date().getTime();
 
-    document.getElementById("spinner").style.display = "none";
+    scrlr.lastQueryTime.live = new Date().getTime();
     liveSearchJsonpRequest.removeScriptTag();
 };
 
@@ -323,13 +329,12 @@ var yahooWebSearchCallback = function(jsonData) {
         ret.push({ title : results[i].Title,
                    snipet : results[i].Summary,
                    url : results[i].Url,
-                   query : scrlr.lastWebQuery,
-                   searchUrl : "http://search.yahoo.co.jp/search?ei=UTF-8&p=" + encodeURIComponent(scrlr.lastWebQuery)
+                   query : scrlr.lastQuery.web,
+                   searchUrl : "http://search.yahoo.co.jp/search?ei=UTF-8&p=" + encodeURIComponent(scrlr.lastQuery.web)
                  });
     }
     scrlr.webQueue = scrlr.webQueue.concat(ret);
-    scrlr.lastWebQueryTime = new Date().getTime();
-    document.getElementById("spinner").style.display = "none";
+    scrlr.lastQueryTime.web = new Date().getTime();
     yahooWebSearchJsonpRequest.removeScriptTag();
 };
 
@@ -344,15 +349,36 @@ var yahooImgSearchCallback = function(jsonData) {
                    refererUrl : results[i].RefererUrl,
                    height : parseInt(results[i].Thumbnail.Height, 10),
                    width : parseInt(results[i].Thumbnail.Width, 10),
-                   query : scrlr.lastImgQuery,
-                   searchUrl : ("http://images.search.yahoo.com/search/images?ei=UTF-8&p=" + 
-                                encodeURIComponent(scrlr.lastImgQuery))
+                   query : scrlr.lastQuery.img,
+                   searchUrl : ("http://images.search.yahoo.com/search/images?ei=UTF-8&p=" +
+                                encodeURIComponent(scrlr.lastQuery.img))
                  });
     }
     scrlr.imgQueue = scrlr.imgQueue.concat(ret);
-    scrlr.lastImgQueryTime = new Date().getTime();
-    document.getElementById("spinner").style.display = "none";
+    scrlr.lastQueryTime.img = new Date().getTime();
     yahooImgSearchJsonpRequest.removeScriptTag();
+};
+
+var jsonFlickrApi = function(jsonData) {
+    var ret = [];
+    var results = jsonData.photos.photo;
+    var n = results.length;
+    for (var i = 0; i < n; i++) {
+        ret.push({ title : results[i].title,
+                   snipet : '',
+                   url : ("http://farm" + results[i].farm + ".static.flickr.com/" +
+                          results[i].server + "/" + results[i].id + "_" + results[i].secret + "_m.jpg"),
+                   refererUrl : "http://www.flickr.com/photos/" + results[i].owner + "/" + results[i].id,
+                   height : null,
+                   width : null,
+                   query : scrlr.lastQuery.img,
+                   searchUrl : ("http://www.flickr.com/search/?w=all&m=text&q=" +
+                                encodeURIComponent(scrlr.lastQuery.img))
+                 });
+    }
+    scrlr.imgQueue = scrlr.imgQueue.concat(ret);
+    scrlr.lastQueryTime.img = new Date().getTime();
+    flickrImgSearchJsonpRequest.removeScriptTag();
 };
 
 YAHOO.util.Event.onDOMReady(scrlr.onLoad.bind(scrlr));

@@ -20,22 +20,20 @@
 </head>
 <body>
 <div id="header">
-<table style="width: 100%">
-<tr>
+<table style="width: 100%"><tr>
 <td style="text-align: left" width="20%">
 <span id="scrlr" title="スクローラー">Scrlr</span>
-<noscript><p>このページを見るためには、 JavaScript が必要です。</p></noscript>
+<noscript>このページを見るためには、 JavaScript が必要です。</noscript>
 [<span id="status" class="status">&gt;&gt;</span>]
 <a id="help" href="help.html" target="help">Help</a>
+<img id="spinner" width="16" height="16" alt="" src="ajax-loader.gif">
 </td>
-<td style="text-align: right" width="10%">
-<div id="spinnerSpace"><img id="spinner" alt="" src="ajax-loader.gif"></div>
-</td>
-<td style="text-align: left" width="20%">
-<span>&ldquo;</span><span id="key"></span><span>&rdquo;</span>
+<td style="text-align: left" width="25%">
+<span id="searchLog"></span>
 </td>
 <td style="text-align: right">
 <div style="font-size: small">Powered by
+<a href="http://www.flickr.com/services/api/">Flickr Services</a>, 
 <a href="http://dev.live.com/livesearch/" target="powered_by">Live Search</a>, 
 <a href="http://developer.yahoo.com/search/image/V1/imageSearch.html" target="powered_by">Yahoo! Image Search</a>
 <a href="http://developer.yahoo.co.jp/about" target="powered_by">
@@ -45,8 +43,7 @@
 </a>
 </div>
 </td>
-</tr>
-</table>
+</tr></table>
 </div>
 <div id="mouseCaptureArea"></div>
 <div id="canvas"></div>

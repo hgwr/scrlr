@@ -19,25 +19,26 @@ div#header {
 #scrlr {
   color: #fff;
   background-color: #000;
+  margin-right: 0.5em;
 }
 
 #help {
-  margin-left: 1em;
+  margin-left: 0.5em;
   font-size: small;
-}
-
-div#spinnerSpace {
-  width: 16px;
-  height: 16px;
 }
 
 img#spinner {
   display: none;
+  margin-left: 0.5em;
   vertical-align: bottom;
 }
 
 div#header a, div#header span, div#header img {
   vertical-align: bottom;
+}
+
+#searchLog {
+  font-size: small;
 }
 
 div#mouseCaptureArea {
@@ -78,6 +79,15 @@ div.panel img {
   float: left;
   margin-right: 5px;
   z-index: 55;
+}
+
+div.panel div.imgDiv {
+  float: left;
+  margin-right: 5px;
+  z-index: 55;
+  width: 240px;
+  height: 240px;
+  overflow: hidden;
 }
 
 div.panel div.title {

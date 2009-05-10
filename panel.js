@@ -22,9 +22,16 @@ Panel.prototype = {
             this.element.className = "panel img_panel";
             this.imgElement = document.createElement("img");
             this.imgElement.src = url;
-            this.imgElement.width = imgWidth;
-            this.imgElement.height = imgHeight;
-            this.element.appendChild(this.imgElement);
+            if (imgWidth === null || imgHeight === null) {
+                this.imgDivElement = document.createElement("div");
+                this.imgDivElement.className = "imgDiv";
+                this.imgDivElement.appendChild(this.imgElement);
+                this.element.appendChild(this.imgDivElement);
+            } else {
+                this.imgElement.width = imgWidth;
+                this.imgElement.height = imgHeight;
+                this.element.appendChild(this.imgElement);
+            }
         }
 
         this.titleElement = document.createElement("div");
