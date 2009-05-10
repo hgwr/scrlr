@@ -7,7 +7,7 @@ var flickrImgSearchJsonpRequest = null;
 var flickrImgSearch = function(q) {
     displaySearchStart(q);
     var url = "http://www.flickr.com/services/rest/?method=flickr.photos.search&format=json&api_key=" + APPID_F +
-        "&content_type=1&per_page=5&text=" + encodeURIComponent(q);
+        "&per_page=5&text=" + encodeURIComponent(q);
     flickrImgSearchJsonpRequest = new JSONscriptRequest(url);
     flickrImgSearchJsonpRequest.buildScriptTag();
     flickrImgSearchJsonpRequest.addScriptTag();
