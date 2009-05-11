@@ -80,8 +80,8 @@ Panel.prototype = {
 
     onClick : function(e) {
         this.scrlr.stopScrlr();
-        ignore_exception(window, window.open, this.searchUrl, "search");
-        ignore_exception(window, window.open, this.clickUrl);
+        try { window.open(this.searchUrl, "search"); } catch (ex) { }
+        try { window.open(this.clickUrl); } catch (ex2) { }
     },
 
     onMouseover : function(e) {

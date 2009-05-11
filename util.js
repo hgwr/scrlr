@@ -4,15 +4,6 @@ var YUE = YAHOO.util.Event;
 function max(a, b) { return (a > b) ? a : b; }
 function min(a, b) { return (a > b) ? b : a; }
 
-function ignore_exception() {
-    var args = Array.from(arguments), obj = args.shift(), func = args.shift();
-    try {
-        return func.apply(obj, args);
-    } catch (e) {
-        /* do nothing */
-    }
-}
-
 var SYMBOLS_RE = new RegExp('^[ 　!-/\\[\\]\\\\\\^_`{|}~、。！？（）「」『』]+$');
 var keywordFilter = function(keywords) {
     var ret = [];

@@ -7,7 +7,7 @@ var flickrImgSearchJsonpRequest = null;
 var flickrImgSearch = function(q) {
     displaySearchStart(q);
     var url = "http://www.flickr.com/services/rest/?method=flickr.photos.search&format=json&api_key=" + APPID_F +
-        "&per_page=6&sort=interestingness-desc&text=" + encodeURIComponent(q);
+        "&per_page=6&sort=relevance&text=" + encodeURIComponent(q);
     flickrImgSearchJsonpRequest = new JSONscriptRequest(url);
     flickrImgSearchJsonpRequest.buildScriptTag();
     flickrImgSearchJsonpRequest.addScriptTag();
@@ -189,7 +189,7 @@ Scrlr.prototype = {
                 if (y < 2000) { y += 1900; }
                 if (m < 10) { m = "0" + m; }
                 if (d < 10) { d = "0" + d; }
-                q = y + "-" + m + "-" + d + "-";
+                q = y + "-" + m + "-" + d;
             }
         }
 
@@ -371,8 +371,7 @@ var jsonFlickrApi = function(jsonData) {
                    height : null,
                    width : null,
                    query : scrlr.lastQuery.img,
-                   searchUrl : ("http://www.flickr.com/search/?w=all&m=text&s=int&q=" +
-                                encodeURIComponent(scrlr.lastQuery.img))
+                   searchUrl : "http://www.flickr.com/search/?q=" + encodeURIComponent(scrlr.lastQuery.img)
                  });
     }
     scrlr.imgQueue = scrlr.imgQueue.concat(ret);
