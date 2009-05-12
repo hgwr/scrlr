@@ -80,8 +80,9 @@ Panel.prototype = {
 
     onClick : function(e) {
         this.scrlr.stopScrlr();
-        try { window.open(this.searchUrl, "search"); } catch (ex) { }
-        try { window.open(this.clickUrl); } catch (ex2) { }
+        try { window.open(this.clickUrl, "_blank"); } catch (ex) { }
+        var searchUrl = this.searchUrl;
+        setTimeout(function() { try { window.open(searchUrl, "search"); } catch (ex) { } }, 2000);
     },
 
     onMouseover : function(e) {

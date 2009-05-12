@@ -145,12 +145,19 @@ Scrlr.prototype = {
             text += " " + this.imgPanels[i].title + " " + this.imgPanels[i].snipet;
         }
         var keywords = shuffle(keywordFilter(this.s.parse(text).uniq()));
+        return this.selectKeyword(keywords);
+    },
+
+    selectKeyword : function(keywords) {
         var ret = null;
-        n = keywords.length;
-        for (i = 0; i < n; i++) {
+        var n = keywords.length;
+        for (var i = 0; i < n; i++) {
             if (! this.usedKeyword(keywords[i])) {
                 ret = keywords[i];
-                this.registerUsedKeyword(ret);
+                this.keywordHistory.push(ret);
+                if (this.keywordHistory.length > 1000) {
+                    this.keywordHistory.shift();
+                }
                 break;
             }
         }
@@ -165,13 +172,6 @@ Scrlr.prototype = {
             }
         }
         return false;
-    },
-
-    registerUsedKeyword : function(k) {
-        this.keywordHistory.push(k);
-        if (this.keywordHistory.length > 1000) {
-            this.keywordHistory.shift();
-        }
     },
 
     prepareQueue : function () {
