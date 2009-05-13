@@ -94,12 +94,14 @@ var shuffle = function(o) { //v1.0
  * http://blog.livedoor.jp/dankogai/archives/50650820.html
  * http://www.dan.co.jp/cases/javascript/encode_entities.html
  * encode_entities.html,v 0.2 2006/10/09 17:21:37 dankogai
+ *
+ * hgwrsgr@gmail.com が、シングルクォートもエスケープするように追加
  */
 function encode_entities(s) {
     var result = '';
     for (var i = 0; i < s.length; i++){
         var c = s.charAt(i);
-        result += {'<':'&lt;', '>':'&gt;', '&':'&amp;', '"':'&quot;'}[c] || c;
+        result += {'<':'&lt;', '>':'&gt;', '&':'&amp;', '"':'&quot;', "'":'&apos;'}[c] || c;
     }
     return result;
 }
