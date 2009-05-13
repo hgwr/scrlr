@@ -54,6 +54,31 @@ Function.prototype.bind = function() {
         return __method.apply(object, args.concat(Array.from(arguments)));
     };
 };
+var Try = {
+  these: function() {
+    var returnValue;
+
+    for (var i = 0, length = arguments.length; i < length; i++) {
+      var lambda = arguments[i];
+      try {
+        returnValue = lambda();
+        break;
+      } catch (e) {}
+    }
+
+    return returnValue;
+  }
+};
+var Ajax = {
+  getTransport: function() {
+    return Try.these(
+        function() {return new XMLHttpRequest();},
+        function() {return new ActiveXObject('Msxml2.XMLHTTP');},
+        function() {return new ActiveXObject('Microsoft.XMLHTTP');}
+    ) || false;
+  }
+};
+
 
 //+ Jonas Raoni Soares Silva
 //@ http://jsfromhell.com/array/shuffle [v1.0]

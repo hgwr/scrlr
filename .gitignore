@@ -3,3 +3,5 @@
 *.html.gz
 *.js.gz
 *.css.gz
+/histories
+/histories/*

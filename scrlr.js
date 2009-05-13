@@ -65,15 +65,14 @@ Scrlr.prototype = {
         YUE.addListener(["header", "mouseCaptureArea"], "mouseover", this.onMouseoverHeader, this, true);
         YUE.addListener(["header", "mouseCaptureArea"], "mouseout", this.onMouseoutHeader, this, true);
         this.polling = new Polling(this.tick.bind(this), this.interval);
+        this.preparing = new Polling(this.prepareQueue.bind(this), this.interval / 2);
         this.runScrlr();
         var p = new Polling(this.checkHideHeader.bind(this), 1000);
         p.run();
     },
 
     checkHideHeader : function() {
-        if (!this.mouseInHeader &&
-            this.polling.running &&
-            this.headerVisible &&
+        if (!this.mouseInHeader && this.polling.running && this.headerVisible &&
             new Date().getTime() - this.lastHeaderShowTime >= 12000) {
             this.hideHeader();
         }
@@ -115,6 +114,7 @@ Scrlr.prototype = {
 
     runScrlr : function() {
         if (this.polling.running) { return; }
+        this.preparing.run();
         this.polling.run();
         var s = document.getElementById("status");
         s.style.color = "#fff";
@@ -126,6 +126,7 @@ Scrlr.prototype = {
     stopScrlr : function() {
         this.showHeader();
         if (! this.polling.running) { return; }
+        this.preparing.stop();
         this.polling.stop();
         var s = document.getElementById("status");
         s.style.color = "#f00";
@@ -145,6 +146,24 @@ Scrlr.prototype = {
             text += " " + this.imgPanels[i].title + " " + this.imgPanels[i].snipet;
         }
         var keywords = shuffle(keywordFilter(this.s.parse(text).uniq()));
+        if (USE_HIST_SERVER) {
+            return this.selectKeywordUsingServer(keywords);
+        } else {
+            return this.selectKeyword(keywords);
+        }
+    },
+
+    selectKeywordUsingServer : function(keywords) {
+        var pars = 'keywords=' + encodeURIComponent(keywords.join("\n"));
+        var req = Ajax.getTransport();
+        req.open('POST', HIST_SERVER_URL, false);
+        req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        req.send(pars);
+        if (req.status == 200) {
+            var ret = req.responseText.split("\n");
+            this.registerKeyword(ret[0]);
+            return ret[0];
+        }
         return this.selectKeyword(keywords);
     },
 
@@ -154,14 +173,18 @@ Scrlr.prototype = {
         for (var i = 0; i < n; i++) {
             if (! this.usedKeyword(keywords[i])) {
                 ret = keywords[i];
-                this.keywordHistory.push(ret);
-                if (this.keywordHistory.length > 1000) {
-                    this.keywordHistory.shift();
-                }
+                this.registerKeyword(ret);
                 break;
             }
         }
         return ret;
+    },
+
+    registerKeyword : function(k) {
+        this.keywordHistory.push(k);
+        if (this.keywordHistory.length > 1000) {
+            this.keywordHistory.shift();
+        }
     },
 
     usedKeyword : function(k) {
@@ -180,7 +203,7 @@ Scrlr.prototype = {
         var shortImgQueue = (this.imgQueue.length <= 3);
         if (shortWebQueue || shortImgQueue) {
             q = this.keywordFromPanels();
-            if(q === undefined || q === null) {
+            if(q === undefined || q === null || q.replace(/^\s+|\s+$/g, "") === "") {
                 var date = new Date();
                 date.setTime(date.getTime() - 3 * 86400 * 1000);
                 var y = date.getYear();
@@ -192,7 +215,6 @@ Scrlr.prototype = {
                 q = y + "-" + m + "-" + d;
             }
         }
-
         var now = new Date();
         if (shortWebQueue && now.getTime() - this.lastQueryTime.web >= 30000) {
             this.showHeader();
@@ -231,8 +253,6 @@ Scrlr.prototype = {
                 imgPanels.shift();
             }
         }
-
-        this.prepareQueue();
 
         this.viewportWidth = YDOM.getViewportWidth();
         this.viewportHeight = YDOM.getViewportHeight();
@@ -286,95 +306,106 @@ var scrlr = new Scrlr();
 
 var liveSearchCallback = function(jsonData) {
     var ret = [];
-    var results = jsonData.SearchResponse.Web.Results;
-    var n = results.length;
-    var i = 0;
-    for (i = 0; i < n; i++) {
-        ret.push({ title : results[i].Title,
-                   snipet : results[i].Description,
-                   url : results[i].Url,
-                   query : scrlr.lastQuery.live,
-                   searchUrl : 'http://search.live.com/results.aspx?q=' + encodeURIComponent(scrlr.lastQuery.live)
-                 });
-    }
-    scrlr.webQueue = scrlr.webQueue.concat(ret);
+    var results, n, i;
+    try {
+        results = jsonData.SearchResponse.Web.Results;
+        n = results.length;
+        for (i = 0; i < n; i++) {
+            ret.push({ title : results[i].Title,
+                       snipet : results[i].Description,
+                       url : results[i].Url,
+                       query : scrlr.lastQuery.live,
+                       searchUrl : 'http://search.live.com/results.aspx?q=' + encodeURIComponent(scrlr.lastQuery.live)
+                     });
+        }
+        scrlr.webQueue = scrlr.webQueue.concat(ret);
+    } catch (e) { }
 
-    ret = [];
-    results = jsonData.SearchResponse.Image.Results;
-    n = results.length;
-    for (i = 0; i < n; i++) {
-        ret.push({ title : results[i].Title,
-                   snipet : '',
-                   url : results[i].Thumbnail.Url,
-                   refererUrl : results[i].Url,
-                   height : parseInt(results[i].Thumbnail.Height, 10),
-                   width : parseInt(results[i].Thumbnail.Width, 10),
-                   query : scrlr.lastQuery.live,
-                   searchUrl : ('http://search.live.com/images/results.aspx?scope=images&q=' +
-                                encodeURIComponent(scrlr.lastQuery.live))
-                 });
-    }
-    scrlr.imgQueue = scrlr.imgQueue.concat(ret);
+    try {
+        ret = [];
+        results = jsonData.SearchResponse.Image.Results;
+        n = results.length;
+        for (i = 0; i < n; i++) {
+            ret.push({ title : results[i].Title,
+                       snipet : '',
+                       url : results[i].Thumbnail.Url,
+                       refererUrl : results[i].Url,
+                       height : parseInt(results[i].Thumbnail.Height, 10),
+                       width : parseInt(results[i].Thumbnail.Width, 10),
+                       query : scrlr.lastQuery.live,
+                       searchUrl : ('http://search.live.com/images/results.aspx?scope=images&q=' +
+                                    encodeURIComponent(scrlr.lastQuery.live))
+                     });
+        }
+        scrlr.imgQueue = scrlr.imgQueue.concat(ret);
+    } catch (ex) { }
 
     scrlr.lastQueryTime.live = new Date().getTime();
     liveSearchJsonpRequest.removeScriptTag();
 };
 
 var yahooWebSearchCallback = function(jsonData) {
-    var ret = [];
-    var results = jsonData.ResultSet.Result;
-    var n = results.length;
-    for (var i = 0; i < n; i++) {
-        ret.push({ title : results[i].Title,
-                   snipet : results[i].Summary,
-                   url : results[i].Url,
-                   query : scrlr.lastQuery.web,
-                   searchUrl : "http://search.yahoo.co.jp/search?ei=UTF-8&p=" + encodeURIComponent(scrlr.lastQuery.web)
-                 });
-    }
-    scrlr.webQueue = scrlr.webQueue.concat(ret);
+    try {
+        var ret = [];
+        var results = jsonData.ResultSet.Result;
+        var n = results.length;
+        for (var i = 0; i < n; i++) {
+            ret.push({ title : results[i].Title,
+                       snipet : results[i].Summary,
+                       url : results[i].Url,
+                       query : scrlr.lastQuery.web,
+                       searchUrl : ("http://search.yahoo.co.jp/search?ei=UTF-8&p=" +
+                                    encodeURIComponent(scrlr.lastQuery.web))
+                     });
+        }
+        scrlr.webQueue = scrlr.webQueue.concat(ret);
+    } catch (e) { }
     scrlr.lastQueryTime.web = new Date().getTime();
     yahooWebSearchJsonpRequest.removeScriptTag();
 };
 
 var yahooImgSearchCallback = function(jsonData) {
-    var ret = [];
-    var results = jsonData.ResultSet.Result;
-    var n = results.length;
-    for (var i = 0; i < n; i++) {
-        ret.push({ title : results[i].Title,
-                   snipet : results[i].Summary,
-                   url : results[i].Thumbnail.Url,
-                   refererUrl : results[i].RefererUrl,
-                   height : parseInt(results[i].Thumbnail.Height, 10),
-                   width : parseInt(results[i].Thumbnail.Width, 10),
-                   query : scrlr.lastQuery.img,
-                   searchUrl : ("http://images.search.yahoo.com/search/images?ei=UTF-8&p=" +
-                                encodeURIComponent(scrlr.lastQuery.img))
-                 });
-    }
-    scrlr.imgQueue = scrlr.imgQueue.concat(ret);
+    try {
+        var ret = [];
+        var results = jsonData.ResultSet.Result;
+        var n = results.length;
+        for (var i = 0; i < n; i++) {
+            ret.push({ title : results[i].Title,
+                       snipet : results[i].Summary,
+                       url : results[i].Thumbnail.Url,
+                       refererUrl : results[i].RefererUrl,
+                       height : parseInt(results[i].Thumbnail.Height, 10),
+                       width : parseInt(results[i].Thumbnail.Width, 10),
+                       query : scrlr.lastQuery.img,
+                       searchUrl : ("http://images.search.yahoo.com/search/images?ei=UTF-8&p=" +
+                                    encodeURIComponent(scrlr.lastQuery.img))
+                     });
+        }
+        scrlr.imgQueue = scrlr.imgQueue.concat(ret);
+    } catch (e) { }
     scrlr.lastQueryTime.img = new Date().getTime();
     yahooImgSearchJsonpRequest.removeScriptTag();
 };
 
 var jsonFlickrApi = function(jsonData) {
-    var ret = [];
-    var results = jsonData.photos.photo;
-    var n = results.length;
-    for (var i = 0; i < n; i++) {
-        ret.push({ title : results[i].title,
-                   snipet : '',
-                   url : ("http://farm" + results[i].farm + ".static.flickr.com/" +
-                          results[i].server + "/" + results[i].id + "_" + results[i].secret + "_m.jpg"),
-                   refererUrl : "http://www.flickr.com/photos/" + results[i].owner + "/" + results[i].id,
-                   height : null,
-                   width : null,
-                   query : scrlr.lastQuery.img,
-                   searchUrl : "http://www.flickr.com/search/?q=" + encodeURIComponent(scrlr.lastQuery.img)
-                 });
-    }
-    scrlr.imgQueue = scrlr.imgQueue.concat(ret);
+    try {
+        var ret = [];
+        var results = jsonData.photos.photo;
+        var n = results.length;
+        for (var i = 0; i < n; i++) {
+            ret.push({ title : results[i].title,
+                       snipet : '',
+                       url : ("http://farm" + results[i].farm + ".static.flickr.com/" +
+                              results[i].server + "/" + results[i].id + "_" + results[i].secret + "_m.jpg"),
+                       refererUrl : "http://www.flickr.com/photos/" + results[i].owner + "/" + results[i].id,
+                       height : null,
+                       width : null,
+                       query : scrlr.lastQuery.img,
+                       searchUrl : "http://www.flickr.com/search/?q=" + encodeURIComponent(scrlr.lastQuery.img)
+                     });
+        }
+        scrlr.imgQueue = scrlr.imgQueue.concat(ret);
+    } catch (e) { }
     scrlr.lastQueryTime.img = new Date().getTime();
     flickrImgSearchJsonpRequest.removeScriptTag();
 };
