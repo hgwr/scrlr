@@ -98,6 +98,9 @@ var shuffle = function(o) { //v1.0
  * hgwrsgr@gmail.com が、シングルクォートもエスケープするように追加
  */
 function encode_entities(s) {
+    if (typeof s !== "string") {
+        return s;
+    }
     var result = '';
     for (var i = 0; i < s.length; i++){
         var c = s.charAt(i);
