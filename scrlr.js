@@ -67,6 +67,7 @@ Scrlr.prototype = {
         this.polling = new Polling(this.tick.bind(this), this.interval);
         this.preparing = new Polling(this.prepareQueue.bind(this), this.interval / 2);
         this.runScrlr();
+        document.getElementById("spinner").style.display = "inline";
         var p = new Polling(this.checkHideHeader.bind(this), 1000);
         p.run();
     },
