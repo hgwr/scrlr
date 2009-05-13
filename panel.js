@@ -36,12 +36,12 @@ Panel.prototype = {
 
         this.titleElement = document.createElement("div");
         this.titleElement.className = "title";
-        this.titleElement.innerHTML = title;
+        this.titleElement.innerHTML = encode_entities(title);
         this.element.appendChild(this.titleElement);
 
         this.snipetElement = document.createElement("div");
         this.snipetElement.className = "snipet";
-        this.snipetElement.innerHTML = snipet;
+        this.snipetElement.innerHTML = encode_entities(snipet);
         this.element.appendChild(this.snipetElement);
 
         this.element.style.width = (width -

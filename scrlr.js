@@ -1,5 +1,5 @@
 var displaySearchStart = function(q) {
-    document.getElementById("searchLog").innerHTML = "&ldquo;" + q + "&rdquo; was searched.";
+    document.getElementById("searchLog").innerHTML = "&ldquo;" + encode_entities(q) + "&rdquo; was searched.";
     document.getElementById("spinner").style.display = "inline";
 };
 

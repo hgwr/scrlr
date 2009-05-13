@@ -88,3 +88,18 @@ var shuffle = function(o) { //v1.0
     for (var j, x, i = o.length; i; j = parseInt(Math.random() * i, 10), x = o[--i], o[i] = o[j], o[j] = x) { }
     return o;
 };
+
+/**
+ * encode_entities() - Dan Kogai
+ * http://blog.livedoor.jp/dankogai/archives/50650820.html
+ * http://www.dan.co.jp/cases/javascript/encode_entities.html
+ * encode_entities.html,v 0.2 2006/10/09 17:21:37 dankogai
+ */
+function encode_entities(s) {
+    var result = '';
+    for (var i = 0; i < s.length; i++){
+        var c = s.charAt(i);
+        result += {'<':'&lt;', '>':'&gt;', '&':'&amp;', '"':'&quot;'}[c] || c;
+    }
+    return result;
+}
