@@ -24,12 +24,16 @@ if ($c !== FALSE) {
 
 $keywords = array();
 if (isset($_POST['keywords']) and strlen($_POST['keywords']) < MAX_POST and trim($_POST['keywords']) !== "") {
-    $keywords = explode("\n", $_POST['keywords']);    
+    foreach (explode("\n", $_POST['keywords']) as $k) {
+        if (strlen($k) < MAX_KEYLEN) {
+            array_push($keywords, $k);
+        }
+    }
 }
 
 $ret = "";
 foreach ($keywords as $k) {
-    if (strlen($k) < MAX_KEYLEN and !isset($history[$k])) {
+    if (!isset($history[$k])) {
         $ret = $k;
         $history[$ret] = 1;
         break;
