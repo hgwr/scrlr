@@ -1,5 +1,5 @@
 var displaySearchStart = function(q) {
-    document.getElementById("searchLog").innerHTML = "&ldquo;" + encode_entities(q) + "&rdquo; was searched.";
+    document.getElementById("searchLog").innerHTML = "&ldquo;" + encode_entities(q.q) + "&rdquo; was searched.";
     document.getElementById("spinner").style.display = "inline";
 };
 
@@ -7,7 +7,7 @@ var flickrImgSearchJsonpRequest = null;
 var flickrImgSearch = function(q) {
     displaySearchStart(q);
     var url = "http://www.flickr.com/services/rest/?method=flickr.photos.search&format=json&api_key=" + APPID_F +
-        "&per_page=6&sort=relevance&text=" + encodeURIComponent(q);
+        "&per_page=6&page=" + q.count + "&sort=relevance&text=" + encodeURIComponent(q.q);
     flickrImgSearchJsonpRequest = new JSONscriptRequest(url);
     flickrImgSearchJsonpRequest.buildScriptTag();
     flickrImgSearchJsonpRequest.addScriptTag();
@@ -17,8 +17,10 @@ var liveSearchJsonpRequest = null;
 var liveSearch = function(q) {
     displaySearchStart(q);
     var url = "http://api.search.live.net/json.aspx?AppId=" + APPID_L +
-        "&Market=ja-JP&Query=" + encodeURIComponent(q) +
-        "&Sources=Web+Image&Web.Count=6&Image.Count=3&JsonType=callback&JsonCallback=liveSearchCallback";
+        "&Market=ja-JP&Query=" + encodeURIComponent(q.q) +
+        "&Sources=Web+Image&Web.Count=6&Image.Count=3" +
+        "&Web.Offset=" + q.count + "&Image.Offset=" + q.count + 
+        "&JsonType=callback&JsonCallback=liveSearchCallback";
     liveSearchJsonpRequest = new JSONscriptRequest(url);
     liveSearchJsonpRequest.buildScriptTag();
     liveSearchJsonpRequest.addScriptTag();
@@ -28,7 +30,9 @@ var yahooWebSearchJsonpRequest = null;
 var yahooWebSearch = function(q) {
     displaySearchStart(q);
     var url = "http://search.yahooapis.jp/WebSearchService/V1/webSearch?appid=" + APPID_Y +
-        "&query=" + encodeURIComponent(q) + "&results=6&output=json&callback=yahooWebSearchCallback";
+        "&query=" + encodeURIComponent(q.q) +
+        "&start=" + (q.count * 6 + 1) +
+        "&results=6&output=json&callback=yahooWebSearchCallback";
     yahooWebSearchJsonpRequest = new JSONscriptRequest(url);
     yahooWebSearchJsonpRequest.buildScriptTag();
     yahooWebSearchJsonpRequest.addScriptTag();
@@ -38,7 +42,9 @@ var yahooImgSearchJsonpRequest = null;
 var yahooImgSearch = function(q) {
     displaySearchStart(q);
     var url = "http://search.yahooapis.com/ImageSearchService/V1/imageSearch?appid=" + APPID_Y_US +
-        "&query=" + encodeURIComponent(q) + "&results=3&output=json&callback=yahooImgSearchCallback";
+        "&query=" + encodeURIComponent(q.q) +
+        "&start=" + (q.count * 6 + 1) +
+        "&results=3&output=json&callback=yahooImgSearchCallback";
     yahooImgSearchJsonpRequest = new JSONscriptRequest(url);
     yahooImgSearchJsonpRequest.buildScriptTag();
     yahooImgSearchJsonpRequest.addScriptTag();
@@ -162,18 +168,19 @@ Scrlr.prototype = {
         req.send(pars);
         if (req.status == 200) {
             var ret = req.responseText.split("\n");
-            this.registerKeyword(ret[0]);
-            return ret[0];
+            ret = { q:ret[0], count:ret[1] };
+            this.registerKeyword(ret);
+            return ret;
         }
         return this.selectKeyword(keywords);
     },
 
     selectKeyword : function(keywords) {
-        var ret = null;
+        var ret = { q:null, count:null };
         var n = keywords.length;
         for (var i = 0; i < n; i++) {
             if (! this.usedKeyword(keywords[i])) {
-                ret = keywords[i];
+                ret = { q:keywords[i], count:1 };
                 this.registerKeyword(ret);
                 break;
             }
@@ -191,7 +198,7 @@ Scrlr.prototype = {
     usedKeyword : function(k) {
         var n = this.keywordHistory.length;
         for (var i = 0; i < n; i++) {
-            if (this.keywordHistory[i] == k) {
+            if (this.keywordHistory[i].q == k) {
                 return true;
             }
         }
@@ -199,12 +206,12 @@ Scrlr.prototype = {
     },
 
     prepareQueue : function () {
-        var q = null;
+        var q = { q:null, count:null };
         var shortWebQueue = (this.webQueue.length <= 3);
         var shortImgQueue = (this.imgQueue.length <= 3);
         if (shortWebQueue || shortImgQueue) {
             q = this.keywordFromPanels();
-            if(q === undefined || q === null || q.replace(/^\s+|\s+$/g, "") === "") {
+            if(q.q === undefined || q.q === null || q.q.replace(/^\s+|\s+$/g, "") === "") {
                 var date = new Date();
                 date.setTime(date.getTime() - 3 * 86400 * 1000);
                 var y = date.getYear();
@@ -213,7 +220,7 @@ Scrlr.prototype = {
                 if (y < 2000) { y += 1900; }
                 if (m < 10) { m = "0" + m; }
                 if (d < 10) { d = "0" + d; }
-                q = y + "-" + m + "-" + d;
+                q = { q:(y + "-" + m + "-" + d), count:1 };
             }
         }
         var now = new Date();
@@ -315,8 +322,9 @@ var liveSearchCallback = function(jsonData) {
             ret.push({ title : results[i].Title,
                        snipet : results[i].Description,
                        url : results[i].Url,
-                       query : scrlr.lastQuery.live,
-                       searchUrl : 'http://search.live.com/results.aspx?q=' + encodeURIComponent(scrlr.lastQuery.live)
+                       query : scrlr.lastQuery.live.q,
+                       searchUrl : ('http://search.live.com/results.aspx?q=' +
+                                    encodeURIComponent(scrlr.lastQuery.live.q))
                      });
         }
         scrlr.webQueue = scrlr.webQueue.concat(ret);
@@ -333,9 +341,9 @@ var liveSearchCallback = function(jsonData) {
                        refererUrl : results[i].Url,
                        height : parseInt(results[i].Thumbnail.Height, 10),
                        width : parseInt(results[i].Thumbnail.Width, 10),
-                       query : scrlr.lastQuery.live,
+                       query : scrlr.lastQuery.live.q,
                        searchUrl : ('http://search.live.com/images/results.aspx?scope=images&q=' +
-                                    encodeURIComponent(scrlr.lastQuery.live))
+                                    encodeURIComponent(scrlr.lastQuery.live.q))
                      });
         }
         scrlr.imgQueue = scrlr.imgQueue.concat(ret);
@@ -354,9 +362,9 @@ var yahooWebSearchCallback = function(jsonData) {
             ret.push({ title : results[i].Title,
                        snipet : results[i].Summary,
                        url : results[i].Url,
-                       query : scrlr.lastQuery.web,
+                       query : scrlr.lastQuery.web.q,
                        searchUrl : ("http://search.yahoo.co.jp/search?ei=UTF-8&p=" +
-                                    encodeURIComponent(scrlr.lastQuery.web))
+                                    encodeURIComponent(scrlr.lastQuery.web.q))
                      });
         }
         scrlr.webQueue = scrlr.webQueue.concat(ret);
@@ -377,9 +385,9 @@ var yahooImgSearchCallback = function(jsonData) {
                        refererUrl : results[i].RefererUrl,
                        height : parseInt(results[i].Thumbnail.Height, 10),
                        width : parseInt(results[i].Thumbnail.Width, 10),
-                       query : scrlr.lastQuery.img,
+                       query : scrlr.lastQuery.img.q,
                        searchUrl : ("http://images.search.yahoo.com/search/images?ei=UTF-8&p=" +
-                                    encodeURIComponent(scrlr.lastQuery.img))
+                                    encodeURIComponent(scrlr.lastQuery.img.q))
                      });
         }
         scrlr.imgQueue = scrlr.imgQueue.concat(ret);
@@ -401,8 +409,8 @@ var jsonFlickrApi = function(jsonData) {
                        refererUrl : "http://www.flickr.com/photos/" + results[i].owner + "/" + results[i].id,
                        height : null,
                        width : null,
-                       query : scrlr.lastQuery.img,
-                       searchUrl : "http://www.flickr.com/search/?q=" + encodeURIComponent(scrlr.lastQuery.img)
+                       query : scrlr.lastQuery.img.q,
+                       searchUrl : "http://www.flickr.com/search/?q=" + encodeURIComponent(scrlr.lastQuery.img.q)
                      });
         }
         scrlr.imgQueue = scrlr.imgQueue.concat(ret);
