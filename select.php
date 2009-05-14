@@ -7,7 +7,7 @@ define(MAX_POST, 10240);
 define(MAX_KEYLEN, 64);
 define(MAX_HIST, 10000);
 
-if (! isset($_COOKIE[CK_NAME])) {
+if (! isset($_COOKIE[CK_NAME]) or !preg_match('/^[0-9a-f]{40}$/', $_COOKIE[CK_NAME])) {
     $id = sha1(rand() . RND_TEXT . time());
 } else {
     $id = $_COOKIE[CK_NAME];
