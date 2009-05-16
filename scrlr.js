@@ -165,11 +165,16 @@ Scrlr.prototype = {
         var req = Ajax.getTransport();
         req.open('POST', HIST_SERVER_URL, false);
         req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        req.send(pars);
-        if (req.status == 200) {
-            var ret = req.responseText.split("\n");
-            ret = { q:ret[0], count:ret[1] };
-            this.registerKeyword(ret);
+        var ret = null;
+        try {
+            req.send(pars);
+            if (req.status == 200) {
+                ret = req.responseText.split("\n");
+                ret = { q:ret[0], count:ret[1] };
+                this.registerKeyword(ret);
+            }
+        } catch (e) { }
+        if (ret !== null) {
             return ret;
         }
         return this.selectKeyword(keywords);
