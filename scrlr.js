@@ -296,7 +296,7 @@ Scrlr.prototype = {
         width.panelLeft = width.clockLeft + width.clock;
         width.imgPanelLeft = width.panelLeft + width.panel + width.space;
 
-        var panel, page, top, scrollDelta, n, i, destY, anim;
+        var panel, page, top, scrollDelta, n, i, destY, anim, cp, cps;
 
         // clock
         panel = new Panel(this);
@@ -304,27 +304,26 @@ Scrlr.prototype = {
         canvas.appendChild(panel.element);
         n = clockPanels.length;
         top = n > 0 ? max(clockPanels[n-1].bottom+1, this.viewportHeight) : this.viewportHeight;
-        var now = new Date();
         panel.init(null, null, width.clock, width.clockLeft, top, '', '', null);
         clockPanels.push(panel);
         n += 1;
         this.tickClock();
         scrollDelta = panel.getRealHeight();
         for (i = 0; i < n; i++) {
-            destY = clockPanels[i].top - scrollDelta;
-            anim = new YAHOO.util.Motion(clockPanels[i].element, { points: { to: [width.clockLeft, destY] } }, 3);
+            cp = clockPanels[i];
+            destY = cp.top - scrollDelta;
+            anim = new YAHOO.util.Motion(cp.element, { points: { to: [width.clockLeft, destY] } }, 3);
             anim.animate();
-            clockPanels[i].top -= scrollDelta;
-            clockPanels[i].bottom -= scrollDelta;
+            cp.top -= scrollDelta;
+            cp.bottom -= scrollDelta;
         }
         if (n > 1) {
-            var ttp = clockPanels[0];
-            anim = new YAHOO.util.ColorAnim(ttp.titleElement, { color: { to: '#000' } }, 3);
-            anim.animate();
-            var ttps = ttp.snipetElement;
-            anim = new YAHOO.util.ColorAnim(ttps, { color: { to: '#000' } }, 3);
-            anim.animate();
-            anim = new YAHOO.util.ColorAnim(ttps.getElementsByTagName('span')[0], { color: { to: '#000' } }, 3);
+            cp = clockPanels[0];
+            cp.titleElement.style.color = 'inherit';
+            cps = cp.snipetElement;
+            cps.style.color = 'inherit';
+            cps.getElementsByTagName('span')[0].style.color = 'inherit';
+            anim = new YAHOO.util.ColorAnim(cp.element, { color: { to: '#000' } }, 3);
             anim.animate();
         }
 
@@ -341,11 +340,12 @@ Scrlr.prototype = {
             n += 1;
             scrollDelta = panel.getRealHeight();
             for (i = 0; i < n; i++) {
-                destY = webPanels[i].top - scrollDelta;
-                anim = new YAHOO.util.Motion(webPanels[i].element, { points: { to: [width.panelLeft, destY] } }, 3);
+                var wp = webPanels[i];
+                destY = wp.top - scrollDelta;
+                anim = new YAHOO.util.Motion(wp.element, { points: { to: [width.panelLeft, destY] } }, 3);
                 anim.animate();
-                webPanels[i].top -= scrollDelta;
-                webPanels[i].bottom -= scrollDelta;
+                wp.top -= scrollDelta;
+                wp.bottom -= scrollDelta;
             }
         }
 
@@ -363,12 +363,12 @@ Scrlr.prototype = {
             n += 1;
             scrollDelta = panel.getRealHeight();
             for (i = 0; i < n; i++) {
-                destY = imgPanels[i].top - scrollDelta;
-                anim = new YAHOO.util.Motion(imgPanels[i].element,
-                                             { points: { to: [width.imgPanelLeft, destY] } }, 3);
+                var ip = imgPanels[i];
+                destY = ip.top - scrollDelta;
+                anim = new YAHOO.util.Motion(ip.element, { points: { to: [width.imgPanelLeft, destY] } }, 3);
                 anim.animate();
-                imgPanels[i].top -= scrollDelta;
-                imgPanels[i].bottom -= scrollDelta;
+                ip.top -= scrollDelta;
+                ip.bottom -= scrollDelta;
             }
         }
     }
