@@ -5,7 +5,7 @@ function max(a, b) { return (a > b) ? a : b; }
 function min(a, b) { return (a > b) ? b : a; }
 
 var SYMBOLS_RE = new RegExp('^[ 　!-/\\[\\]\\\\\\^_`{|}~、。！？（）「」『』]+$');
-var keywordFilter = function(keywords) {
+function keywordFilter(keywords) {
     var ret = [];
     var n = keywords.length;
     for (var i = 0; i < n; i++) {
@@ -15,7 +15,36 @@ var keywordFilter = function(keywords) {
         }
     }
     return ret;
-};
+}
+
+function convertDateToString(date) {
+    var y = date.getYear();
+    var m = date.getMonth() + 1;
+    var d = date.getDate();
+    if (y < 2000) { y += 1900; }
+    if (m < 10) { m = "0" + m; }
+    if (d < 10) { d = "0" + d; }
+    return y + "-" + m + "-" + d;
+}
+
+var DoW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+function convertDateToDoW(date) {
+    return DoW[date.getDay()];
+}
+
+function convertDateToHM(date) {
+    var h = date.getHours();
+    var m = date.getMinutes();
+    if (h < 10) { h = "0" + h; }
+    if (m < 10) { m = "0" + m; }
+    return h + ":" + m;
+}
+
+function convertDateToSec(date) {
+    var s = date.getSeconds();
+    if (s < 10) { s = "0" + s; }
+    return s;
+}
 
 /*
  * 「JavaScript: Array.prototype.uniq - mayokara note」 2008-07-01
@@ -79,15 +108,14 @@ var Ajax = {
   }
 };
 
-
 //+ Jonas Raoni Soares Silva
 //@ http://jsfromhell.com/array/shuffle [v1.0]
 // http://snippets.dzone.com/posts/show/849
 // hgwrsgr@gmail.com がちょっと修正
-var shuffle = function(o) { //v1.0
+function shuffle(o) { //v1.0
     for (var j, x, i = o.length; i; j = parseInt(Math.random() * i, 10), x = o[--i], o[i] = o[j], o[j] = x) { }
     return o;
-};
+}
 
 /**
  * encode_entities() - Dan Kogai

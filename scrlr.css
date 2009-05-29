@@ -12,7 +12,7 @@ div#header {
   height: 2em;
   color: #888;
   background-color: #000;
-  font-family: "Bitstream Vera Sans",Verdana,sans-serif;
+  font-family: "bitstream vera sans",verdana,sans-serif;
   z-index: 100;
 }
 
@@ -37,11 +37,11 @@ div#header a, div#header span, div#header img {
   vertical-align: bottom;
 }
 
-#searchLog {
+#search_log {
   font-size: small;
 }
 
-div#mouseCaptureArea {
+div#mouse_capture_area {
   position: absolute;
   top: 0px;
   left: 0px;
@@ -79,7 +79,7 @@ div.panel img {
   z-index: 55;
 }
 
-div.panel div.imgDiv {
+div.panel div.img_div {
   float: left;
   margin-right: 5px;
   z-index: 55;
@@ -103,4 +103,22 @@ div.panel div.snipet {
   line-height: 150%;
   text-align: justify;
   z-index: 55;
+}
+
+div.clock_panel div.title,
+div.clock_panel div.snipet {
+  color: #888;
+  background-color: #000;
+  font-size: small;
+  font-weight: normal;
+  line-height: 150%;
+  font-family: "consolas","andale Mono","courier new",monospace;
+  text-align: left;
+}
+
+div.clock_panel div.snipet span.time {
+  font-size: x-large;
+  line-height: 150%;
+  color: #bbb;
+  background-color: #000;
 }

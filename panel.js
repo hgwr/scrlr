@@ -24,7 +24,7 @@ Panel.prototype = {
             this.imgElement.src = url;
             if (imgWidth === null || imgHeight === null) {
                 this.imgDivElement = document.createElement("div");
-                this.imgDivElement.className = "imgDiv";
+                this.imgDivElement.className = "img_div";
                 this.imgDivElement.appendChild(this.imgElement);
                 this.element.appendChild(this.imgDivElement);
             } else {
@@ -34,10 +34,12 @@ Panel.prototype = {
             }
         }
 
-        this.titleElement = document.createElement("div");
-        this.titleElement.className = "title";
-        this.titleElement.innerHTML = encode_entities(title);
-        this.element.appendChild(this.titleElement);
+        if (title !== null) {
+            this.titleElement = document.createElement("div");
+            this.titleElement.className = "title";
+            this.titleElement.innerHTML = encode_entities(title);
+            this.element.appendChild(this.titleElement);
+        }
 
         this.snipetElement = document.createElement("div");
         this.snipetElement.className = "snipet";
@@ -50,7 +52,9 @@ Panel.prototype = {
                                     parseInt(YDOM.getStyle(this.element, 'marginLeft'), 10) -
                                     parseInt(YDOM.getStyle(this.element, 'marginRight'), 10)
                                    ) + "px";
-        this.element.title = '\u201C' + this.query + "\u201D \u2192 " + this.clickUrl;
+        if (this.query !== null) {
+            this.element.title = '\u201C' + this.query + "\u201D \u2192 " + this.clickUrl;
+        }
 
         this.left = top;
         this.style.left = left + "px";
@@ -58,9 +62,11 @@ Panel.prototype = {
         this.style.top = top + "px";
         this.reloadPosition();
 
-        YUE.addListener(this.element, "click", this.onClick, this, true);
-        YUE.addListener(this.element, "mouseover", this.onMouseover, this, true);
-        YUE.addListener(this.element, "mouseout", this.onMouseout, this, true);
+        if (this.searchUrl !== null) {
+            YUE.addListener(this.element, "click", this.onClick, this, true);
+            YUE.addListener(this.element, "mouseover", this.onMouseover, this, true);
+            YUE.addListener(this.element, "mouseout", this.onMouseout, this, true);
+        }
     },
 
     getRealHeight : function() {

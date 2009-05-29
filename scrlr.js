@@ -1,5 +1,5 @@
 var displaySearchStart = function(q) {
-    document.getElementById("searchLog").innerHTML = "&ldquo;" + encode_entities(q.q) + "&rdquo; was searched.";
+    document.getElementById("search_log").innerHTML = "&ldquo;" + encode_entities(q.q) + "&rdquo; was searched.";
     document.getElementById("spinner").style.display = "inline";
 };
 
@@ -19,7 +19,7 @@ var liveSearch = function(q) {
     var url = "http://api.search.live.net/json.aspx?AppId=" + APPID_L +
         "&Market=ja-JP&Query=" + encodeURIComponent(q.q) +
         "&Sources=Web+Image&Web.Count=6&Image.Count=3" +
-        "&Web.Offset=" + q.count + "&Image.Offset=" + q.count + 
+        "&Web.Offset=" + q.count + "&Image.Offset=" + q.count +
         "&JsonType=callback&JsonCallback=liveSearchCallback";
     liveSearchJsonpRequest = new JSONscriptRequest(url);
     liveSearchJsonpRequest.buildScriptTag();
@@ -55,6 +55,7 @@ var Scrlr = function() {
     this.s = new SimpleAnalyzer();
     this.webQueue = [];
     this.imgQueue = [];
+    this.clockPanels = [];
     this.webPanels = [];
     this.imgPanels = [];
     this.keywordHistory = [];
@@ -68,13 +69,15 @@ Scrlr.prototype = {
     onLoad : function() {
         this.canvas = document.getElementById("canvas");
         YUE.addListener("header", "click", this.onScrlrClick, this, true);
-        YUE.addListener(["header", "mouseCaptureArea"], "mouseover", this.onMouseoverHeader, this, true);
-        YUE.addListener(["header", "mouseCaptureArea"], "mouseout", this.onMouseoutHeader, this, true);
+        YUE.addListener(["header", "mouse_capture_area"], "mouseover", this.onMouseoverHeader, this, true);
+        YUE.addListener(["header", "mouse_capture_area"], "mouseout", this.onMouseoutHeader, this, true);
         this.polling = new Polling(this.tick.bind(this), this.interval);
         this.preparing = new Polling(this.prepareQueue.bind(this), this.interval / 2);
         this.runScrlr();
         document.getElementById("spinner").style.display = "inline";
         var p = new Polling(this.checkHideHeader.bind(this), 1000);
+        p.run();
+        p = new Polling(this.tickClock.bind(this), 1000);
         p.run();
     },
 
@@ -82,6 +85,17 @@ Scrlr.prototype = {
         if (!this.mouseInHeader && this.polling.running && this.headerVisible &&
             new Date().getTime() - this.lastHeaderShowTime >= 12000) {
             this.hideHeader();
+        }
+    },
+
+    tickClock : function() {
+        var n = this.clockPanels.length;
+        if (n > 0) {
+            var tp = this.clockPanels[n-1];
+            var now = new Date();
+            tp.titleElement.innerHTML = convertDateToString(now) + '&nbsp;(' + convertDateToDoW(now) + ')';
+            tp.snipetElement.innerHTML = '<span class="time">' + convertDateToHM(now) + '</span>:' +
+                convertDateToSec(now);
         }
     },
 
@@ -219,13 +233,7 @@ Scrlr.prototype = {
             if(q.q === undefined || q.q === null || q.q.replace(/^\s+|\s+$/g, "") === "") {
                 var date = new Date();
                 date.setTime(date.getTime() - 3 * 86400 * 1000);
-                var y = date.getYear();
-                var m = date.getMonth() + 1;
-                var d = date.getDate();
-                if (y < 2000) { y += 1900; }
-                if (m < 10) { m = "0" + m; }
-                if (d < 10) { d = "0" + d; }
-                q = { q:(y + "-" + m + "-" + d), count:1 };
+                q = { q:convertDateToString(date), count:1 };
             }
         }
         var now = new Date();
@@ -250,10 +258,17 @@ Scrlr.prototype = {
     tick : function() {
         document.getElementById("spinner").style.display = "none";
 
+        var canvas = this.canvas;
+        var clockPanels = this.clockPanels;
+        if (clockPanels.length > 1) {
+            canvas.removeChild(clockPanels[0].element);
+            YUE.purgeElement(clockPanels[0].element, true);
+            clockPanels.shift();
+        }
         var webPanels = this.webPanels;
         if (webPanels.length > 0) {
             if (webPanels[0].bottom <= 0) {
-                this.canvas.removeChild(webPanels[0].element);
+                canvas.removeChild(webPanels[0].element);
                 YUE.purgeElement(webPanels[0].element, true);
                 webPanels.shift();
             }
@@ -261,7 +276,7 @@ Scrlr.prototype = {
         var imgPanels = this.imgPanels;
         if (imgPanels.length > 0) {
             if (imgPanels[0].bottom <= 0) {
-                this.canvas.removeChild(imgPanels[0].element);
+                canvas.removeChild(imgPanels[0].element);
                 YUE.purgeElement(imgPanels[0].element);
                 imgPanels.shift();
             }
@@ -269,44 +284,88 @@ Scrlr.prototype = {
 
         this.viewportWidth = YDOM.getViewportWidth();
         this.viewportHeight = YDOM.getViewportHeight();
-        var center = this.viewportWidth / 2;
-        var panelWidth = center * 0.9;
-        var left = (center * 0.1) / 2 ;
+        //
+        // |-----------------ViewportWidth 99%----------------|
+        // | clock(14%) | panel(42%) | space(1%) | panel(42%) |
+        //
+        var width = { };
+        width.space = (this.viewportWidth / 100) * 1;
+        width.clock = (this.viewportWidth / 100) * 14;
+        width.panel = (this.viewportWidth / 100) * 42;
+        width.clockLeft = 0;
+        width.panelLeft = width.clockLeft + width.clock;
+        width.imgPanelLeft = width.panelLeft + width.panel + width.space;
+
         var panel, page, top, scrollDelta, n, i, destY, anim;
+
+        // clock
+        panel = new Panel(this);
+        panel.element.className = "panel clock_panel";
+        canvas.appendChild(panel.element);
+        n = clockPanels.length;
+        top = n > 0 ? max(clockPanels[n-1].bottom+1, this.viewportHeight) : this.viewportHeight;
+        var now = new Date();
+        panel.init(null, null, width.clock, width.clockLeft, top, '', '', null);
+        clockPanels.push(panel);
+        n += 1;
+        this.tickClock();
+        scrollDelta = panel.getRealHeight();
+        for (i = 0; i < n; i++) {
+            destY = clockPanels[i].top - scrollDelta;
+            anim = new YAHOO.util.Motion(clockPanels[i].element, { points: { to: [width.clockLeft, destY] } }, 3);
+            anim.animate();
+            clockPanels[i].top -= scrollDelta;
+            clockPanels[i].bottom -= scrollDelta;
+        }
+        if (n > 1) {
+            var ttp = clockPanels[0];
+            anim = new YAHOO.util.ColorAnim(ttp.titleElement, { color: { to: '#000' } }, 3);
+            anim.animate();
+            var ttps = ttp.snipetElement;
+            anim = new YAHOO.util.ColorAnim(ttps, { color: { to: '#000' } }, 3);
+            anim.animate();
+            anim = new YAHOO.util.ColorAnim(ttps.getElementsByTagName('span')[0], { color: { to: '#000' } }, 3);
+            anim.animate();
+        }
+
+        // web
         if (this.webQueue.length > 0) {
             panel = new Panel(this);
-            this.canvas.appendChild(panel.element);
+            canvas.appendChild(panel.element);
             page = this.webQueue.shift();
-            top = (webPanels.length > 0 ? max(webPanels[webPanels.length-1].bottom+1, this.viewportHeight) :
-                   this.viewportHeight);
-            panel.init(page.query, page.searchUrl, panelWidth, left, top, page.title, page.snipet, page.url);
-            webPanels.push(panel);
-            scrollDelta = panel.getRealHeight();
             n = webPanels.length;
-            i = 0;
+            top = n > 0 ? max(webPanels[n-1].bottom+1, this.viewportHeight) : this.viewportHeight;
+            panel.init(page.query, page.searchUrl, width.panel,
+                       width.panelLeft, top, page.title, page.snipet, page.url);
+            webPanels.push(panel);
+            n += 1;
+            scrollDelta = panel.getRealHeight();
             for (i = 0; i < n; i++) {
                 destY = webPanels[i].top - scrollDelta;
-                anim = new YAHOO.util.Motion(webPanels[i].element, { points: { to: [left, destY] } }, 3);
+                anim = new YAHOO.util.Motion(webPanels[i].element, { points: { to: [width.panelLeft, destY] } }, 3);
                 anim.animate();
                 webPanels[i].top -= scrollDelta;
                 webPanels[i].bottom -= scrollDelta;
             }
         }
+
+        // image
         if (this.imgQueue.length > 0) {
             panel = new Panel(this);
-            this.canvas.appendChild(panel.element);
+            canvas.appendChild(panel.element);
             page = this.imgQueue.shift();
-            top = (imgPanels.length > 0 ? max(imgPanels[imgPanels.length-1].bottom+1, this.viewportHeight) :
-                   this.viewportHeight);
-            panel.init(page.query, page.searchUrl, panelWidth, center+left, top, page.title, page.snipet, page.url,
+            n = imgPanels.length;
+            top = n > 0 ? max(imgPanels[n-1].bottom+1, this.viewportHeight) : this.viewportHeight;
+            panel.init(page.query, page.searchUrl, width.panel,
+                       width.imgPanelLeft, top, page.title, page.snipet, page.url,
                        page.refererUrl, page.width, page.height);
             imgPanels.push(panel);
+            n += 1;
             scrollDelta = panel.getRealHeight();
-            n = imgPanels.length;
-            i = 0;
             for (i = 0; i < n; i++) {
                 destY = imgPanels[i].top - scrollDelta;
-                anim = new YAHOO.util.Motion(imgPanels[i].element, { points: { to: [center+left, destY] } }, 3);
+                anim = new YAHOO.util.Motion(imgPanels[i].element,
+                                             { points: { to: [width.imgPanelLeft, destY] } }, 3);
                 anim.animate();
                 imgPanels[i].top -= scrollDelta;
                 imgPanels[i].bottom -= scrollDelta;
