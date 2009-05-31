@@ -303,7 +303,7 @@ Scrlr.prototype = {
         panel.element.className = "panel clock_panel";
         canvas.appendChild(panel.element);
         n = clockPanels.length;
-        top = n > 0 ? max(clockPanels[n-1].bottom+1, this.viewportHeight) : this.viewportHeight;
+        top = this.viewportHeight;
         panel.init(null, null, width.clock, width.clockLeft, top, '', '', null);
         clockPanels.push(panel);
         n += 1;
