@@ -12,7 +12,7 @@ div#header {
   height: 2em;
   color: #888;
   background-color: #000;
-  font-family: "bitstream vera sans",verdana,sans-serif;
+  font-family: "bitstream vera sans",helvetica,arial,sans-serif;
   z-index: 100;
 }
 
