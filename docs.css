@@ -2,7 +2,7 @@ body {
   border: #000 0px solid;
   color: #888;
   background-color: #000;
-  font-family: "Bitstream Vera Sans",Verdana,sans-serif;
+  font-family: "bitstream vera sans",helvetica,arial,sans-serif;
   line-height: 150%;
   text-align: justify;
 }
@@ -28,13 +28,13 @@ a:hover {
 }
 
 code, pre {
-  font-family: "Consolas","Andale Mono","Courier New",monospace;
+  font-family: "consolas","andale mono","courier new",monospace;
   font-size: small;
 }
 
 span.status {
   font-weight: bold;
-  font-family: "Consolas","Andale Mono","Courier New",monospace;
+  font-family: "consolas","andale mono","courier new",monospace;
 }
 
 span.status:hover {
