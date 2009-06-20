@@ -10,9 +10,9 @@ Panel.prototype = {
         this.query = query;
         this.searchUrl = searchUrl;
         this.title = title;
-        this.snipet = snipet ? snipet.substring(0, 200) : snipet;
-        if (snipet && this.snipet.length > 200) {
-            this.snipet += " ...";
+        this.snipet = snipet;
+        if (typeof this.snipet == 'string' && this.snipet.length > 150) {
+            this.snipet = this.snipet.substring(0,150) + " ...";
         }
         this.url = url;
         this.refererUrl = refererUrl;
@@ -46,7 +46,7 @@ Panel.prototype = {
 
         this.snipetElement = document.createElement("div");
         this.snipetElement.className = "snipet";
-        this.snipetElement.innerHTML = encode_entities(snipet);
+        this.snipetElement.innerHTML = encode_entities(this.snipet);
         this.element.appendChild(this.snipetElement);
 
         this.element.style.width = (width -
