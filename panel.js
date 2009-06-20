@@ -10,7 +10,7 @@ Panel.prototype = {
         this.query = query;
         this.searchUrl = searchUrl;
         this.title = title;
-        this.snipet = snipet.substring(0,200);
+        this.snipet = snipet ? snipet.substring(0, 200) : snipet;
         if (this.snipet.length > 200) {
             this.snipet += " ...";
         }
