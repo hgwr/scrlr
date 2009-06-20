@@ -10,7 +10,10 @@ Panel.prototype = {
         this.query = query;
         this.searchUrl = searchUrl;
         this.title = title;
-        this.snipet = snipet;
+        this.snipet = snipet.substring(0,200);
+        if (this.snipet.length > 200) {
+            this.snipet += " ...";
+        }
         this.url = url;
         this.refererUrl = refererUrl;
         this.clickUrl = url;
