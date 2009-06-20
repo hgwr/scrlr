@@ -105,10 +105,15 @@ div.panel div.snipet {
   z-index: 55;
 }
 
+div.clock_panel { 
+  color: #080;
+  background-color: #000;
+}
+
 div.clock_panel div.title,
 div.clock_panel div.snipet {
-  color: #888;
-  background-color: #000;
+  color: inherit;
+  background-color: inherit;
   font-size: small;
   font-weight: normal;
   line-height: 150%;
@@ -119,6 +124,6 @@ div.clock_panel div.snipet {
 div.clock_panel div.snipet span.time {
   font-size: x-large;
   line-height: 150%;
-  color: #bbb;
+  color: #0b0;
   background-color: #000;
 }
