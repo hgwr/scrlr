@@ -4,7 +4,7 @@ var YUE = YAHOO.util.Event;
 function max(a, b) { return (a > b) ? a : b; }
 function min(a, b) { return (a > b) ? b : a; }
 
-var SYMBOLS_RE = new RegExp('^[ 　!-/\\[\\]\\\\\\^_`{|}~、。！？（）「」『』]+$');
+var SYMBOLS_RE = new RegExp('^[0-9 　!-/\\[\\]\\\\\\^_`{|}~、。！？（）「」『』]+$');
 function keywordFilter(keywords) {
     var ret = [];
     var n = keywords.length;
