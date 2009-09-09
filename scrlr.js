@@ -51,7 +51,7 @@ var yahooImgSearch = function(q) {
 };
 
 var Scrlr = function() {
-    this.interval = 12 * 1000;
+    this.interval = 9 * 1000;
     this.s = new SimpleAnalyzer();
     this.webQueue = [];
     this.imgQueue = [];
